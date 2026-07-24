@@ -48,3 +48,18 @@ assets/        # Logos and static assets
 - Open the Microsoft Graph `webUrl` in Word for the web.
 - Send messages using Microsoft Graph or the approved hotel email provider.
 - Add Supabase only for GCP-owned history, templates, configuration and logs.
+
+
+## Deploy to Streamlit Community Cloud
+
+1. Push this project to the `main` branch of `pms-dev-repo/gcp-core`.
+2. Open Streamlit Community Cloud and choose **Create app**.
+3. Repository: `pms-dev-repo/gcp-core`
+4. Branch: `main`
+5. Main file path: `app.py`
+6. App URL: `gcp-demo`
+7. Select Python 3.12 in Advanced settings and deploy.
+
+The hosted demo cannot launch a desktop application on the visitor's PC.
+It therefore downloads the editable DOCX, which the visitor can open in
+Microsoft Word. Local Windows/macOS development still opens Word Desktop.

@@ -9,7 +9,7 @@ import streamlit as st
 
 from services.document_service import generate_guest_document, read_generated_document
 from services.email_service import send_guest_email
-from services.word_service import open_in_word_365
+from services.word_service import can_open_desktop_word, open_in_word_365
 from utils.state import add_activity
 
 
@@ -174,6 +174,20 @@ def _open_word_365_experience(
 
     return web_url
 
+def _mark_word_reviewed(guest: dict[str, Any]) -> None:
+    guest_id = guest["id"]
+    opened_at = datetime.now().strftime("%I:%M %p").lstrip("0")
+
+    st.session_state.word_opened[guest_id] = True
+    st.session_state.setdefault("word_opened_at", {})[guest_id] = opened_at
+
+    add_activity(
+        guest_id,
+        f"Document downloaded for Word review at {opened_at}",
+    )
+
+
+
 def render_workflow(guest: dict[str, Any]) -> None:
     guest_id = guest["id"]
 
@@ -250,36 +264,63 @@ def render_workflow(guest: dict[str, Any]) -> None:
         use_container_width=False,
     )
 
-    word_button_label = (
-        "✓ Opened in Word"
-        if reviewed
-        else "🟦 Open in Word 365"
-    )
+    desktop_word_available = can_open_desktop_word()
 
-    if st.button(
-        word_button_label,
-        disabled=not generated,
-        key=f"word_{guest_id}",
-        use_container_width=False,
-    ):
-        try:
-            word_url = _open_word_365_experience(guest, generated_path)
+    if desktop_word_available:
+        word_button_label = (
+            "✓ Opened in Word"
+            if reviewed
+            else "🟦 Open in Word Desktop"
+        )
 
-            opened_at = datetime.now().strftime("%I:%M %p").lstrip("0")
-            st.session_state.word_opened[guest_id] = True
-            st.session_state.setdefault("word_opened_at", {})[guest_id] = opened_at
-            st.session_state.setdefault("word_urls", {})[guest_id] = word_url
+        if st.button(
+            word_button_label,
+            disabled=not generated,
+            key=f"word_{guest_id}",
+            use_container_width=False,
+        ):
+            try:
+                if generated_path is None:
+                    raise FileNotFoundError("Generate the document first.")
 
-            add_activity(
-                guest_id,
-                f"Document opened in Word 365 at {opened_at}",
+                word_url = _open_word_365_experience(guest, generated_path)
+
+                opened_at = datetime.now().strftime("%I:%M %p").lstrip("0")
+                st.session_state.word_opened[guest_id] = True
+                st.session_state.setdefault("word_opened_at", {})[guest_id] = opened_at
+                st.session_state.setdefault("word_urls", {})[guest_id] = word_url
+
+                add_activity(
+                    guest_id,
+                    f"Document opened in Word Desktop at {opened_at}",
+                )
+
+                st.toast("Document opened in Microsoft Word.", icon="🟦")
+                st.rerun()
+
+            except (FileNotFoundError, ValueError, KeyError, OSError) as exc:
+                st.error(f"Could not open the document in Word: {exc}")
+    else:
+        st.download_button(
+            "✓ Downloaded for Word" if reviewed else "🟦 Download & Open in Word",
+            data=docx_bytes,
+            file_name=(
+                generated_path.name
+                if generated_path
+                else "guest_letter.docx"
+            ),
+            mime=DOCX_MIME,
+            disabled=not generated,
+            key=f"word_download_{guest_id}",
+            on_click=_mark_word_reviewed,
+            args=(guest,),
+            use_container_width=False,
+        )
+        if generated:
+            st.caption(
+                "The hosted demo downloads the editable DOCX. "
+                "Open it with Microsoft Word on your computer."
             )
-
-            st.toast("Document opened in Microsoft Word.", icon="🟦")
-            st.rerun()
-
-        except (ValueError, KeyError, OSError) as exc:
-            st.error(f"Could not open the document in Word 365: {exc}")
 
     if reviewed:
         opened_at = st.session_state.get("word_opened_at", {}).get(guest_id)

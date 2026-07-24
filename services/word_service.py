@@ -6,16 +6,21 @@ import subprocess
 from pathlib import Path
 
 
-def open_in_word_365(document_path: Path) -> str:
-    """
-    Opens the generated DOCX in the desktop application associated with
-    Microsoft Word on the computer running Streamlit.
+def can_open_desktop_word() -> bool:
+    """Return True only when the Streamlit process can open a desktop app."""
+    environment = os.getenv("GCP_ENV", "auto").strip().lower()
 
-    Important:
-    - In local development, this opens Word on the same PC.
-    - If Streamlit is deployed on a remote server, it opens on the server,
-      not on the hotel user's computer.
-    """
+    if environment == "cloud":
+        return False
+    if environment == "local":
+        return platform.system() in {"Windows", "Darwin"}
+
+    # Streamlit Community Cloud runs on Linux without a desktop session.
+    return platform.system() in {"Windows", "Darwin"}
+
+
+def open_in_word_365(document_path: Path) -> str:
+    """Open a generated DOCX in the desktop copy of Microsoft Word."""
     document_path = Path(document_path).resolve()
 
     if not document_path.exists():
@@ -26,27 +31,23 @@ def open_in_word_365(document_path: Path) -> str:
     if document_path.suffix.lower() != ".docx":
         raise ValueError("Only DOCX documents can be opened in Microsoft Word.")
 
+    if not can_open_desktop_word():
+        raise OSError(
+            "Desktop Word is unavailable in this hosted environment. "
+            "Download the DOCX and open it on your computer."
+        )
+
     system_name = platform.system()
 
     if system_name == "Windows":
-        # Uses the Windows default application for .docx, normally Microsoft Word.
         os.startfile(str(document_path))  # type: ignore[attr-defined]
-
     elif system_name == "Darwin":
         subprocess.Popen(
             ["open", "-a", "Microsoft Word", str(document_path)],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
-
-    elif system_name == "Linux":
-        subprocess.Popen(
-            ["xdg-open", str(document_path)],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-
     else:
-        raise OSError(f"Unsupported operating system: {system_name}")
+        raise OSError(f"Unsupported desktop operating system: {system_name}")
 
     return document_path.as_uri()
