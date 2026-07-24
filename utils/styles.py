@@ -706,6 +706,91 @@ div[data-testid="stFormSubmitButton"] button:hover{
     to{transform:translateX(100%);}
 }
 
+
+
+/* ==========================================================
+   STAY DATE FILTER
+========================================================== */
+
+.stay-filter-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#ffffff;
+    border:1px solid #d9dde5;
+    border-bottom:none;
+    border-radius:12px 12px 0 0;
+    padding:18px 20px 10px;
+    margin-top:2px;
+}
+
+.stay-filter-title{
+    color:#111827;
+    font-size:16px;
+    font-weight:750;
+}
+
+.stay-filter-subtitle{
+    color:#6b7280;
+    font-size:12px;
+    margin-top:3px;
+}
+
+.filter-active-label{
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    color:#6b7280;
+    font-size:12px;
+    font-weight:650;
+}
+
+.date-group-label{
+    min-height:70px;
+    display:flex;
+    align-items:center;
+    color:#111827;
+    font-size:13px;
+    font-weight:700;
+    padding-top:17px;
+}
+
+/* The Streamlit form directly below the filter heading. */
+.stay-filter-heading + div [data-testid="stForm"]{
+    background:#ffffff !important;
+    border:1px solid #d9dde5 !important;
+    border-top:none !important;
+    border-radius:0 0 12px 12px !important;
+    padding:4px 20px 18px !important;
+    margin:0 0 22px !important;
+}
+
+/* Date controls */
+div[data-testid="stDateInput"] label{
+    color:#6b7280 !important;
+    font-size:12px !important;
+    font-weight:600 !important;
+}
+
+div[data-testid="stDateInput"] input{
+    background:#ffffff !important;
+    border-color:#aeb4bc !important;
+    border-radius:3px !important;
+    color:#111827 !important;
+}
+
+@media (max-width:900px){
+    .filter-active-label{
+        justify-content:flex-start;
+    }
+
+    .date-group-label{
+        min-height:auto;
+        padding-top:8px;
+    }
+}
+
         </style>
         """,
         unsafe_allow_html=True,

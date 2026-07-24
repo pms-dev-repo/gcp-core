@@ -47,7 +47,7 @@ def render_header() -> None:
 
         .gcp-brand {
             color: #FFFFFF;
-            font-size: 19px;
+            font-size: 28px;
             font-weight: 700;
             line-height: 1;
             letter-spacing: 0.7px;
@@ -63,7 +63,7 @@ def render_header() -> None:
 
         .gcp-product-name {
             color: #FFFFFF;
-            font-size: 11px;
+            font-size: 16px;
             font-weight: 400;
             white-space: nowrap;
         }
@@ -86,33 +86,33 @@ def render_header() -> None:
 
         .gcp-date {
             color: #FFFFFF;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
         }
 
         .gcp-time {
             color: #D9DCE6;
-            font-size: 9px;
+            font-size:12px;
             margin-top: 2px;
         }
 
         .gcp-user {
             display: flex;
             align-items: center;
-            gap: 9px;
+            gap:12px;
             height: 100%;
         }
 
         .gcp-avatar {
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             border-radius: 6px;
             background-color: #69728F;
             color: #FFFFFF;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9px;
+            font-size:12px;
             font-weight: 600;
             flex-shrink: 0;
         }
@@ -127,13 +127,13 @@ def render_header() -> None:
 
         .gcp-hotel {
             color: #FFFFFF;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 600;
         }
 
         .gcp-username {
             color: #FFFFFF;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 500;
             margin-top: 2px;
         }
@@ -154,7 +154,7 @@ def render_header() -> None:
             }
 
             .gcp-date {
-                font-size: 9px;
+                font-size: 12px;
             }
         }
         </style>
