@@ -10,6 +10,7 @@ def initialize_state(guests: list[dict[str, Any]]) -> None:
     defaults = {
         "selected_guest_id": guests[0]["id"],
         "document_status": {},
+        "generated_documents": {},
         "activity": {},
         "word_opened": {},
         "email_sent": {},
@@ -34,6 +35,6 @@ def get_status(guest: dict[str, Any]) -> str:
         return "Sent"
     if st.session_state.word_opened.get(guest_id):
         return "Reviewed"
-    if st.session_state.document_status.get(guest_id):
+    if st.session_state.generated_documents.get(guest_id):
         return "Generated"
     return "Ready"

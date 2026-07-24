@@ -4,71 +4,775 @@
       "id": "arr-2087239",
       "movement": "Arrivals",
       "confirmation_number": "2087239",
+      "salutation": "Mr.",
       "first_name": "John",
       "last_name": "Smith",
       "full_name": "John Smith",
+      "company": "",
       "room": "306",
       "vip_level": "Platinum",
       "email": "john.smith@example.com",
-      "stay": {"arrival_date": "Jul 18, 2026", "departure_date": "Jul 25, 2026", "nights": 7, "adults": 2, "children": 1},
-      "transport": {"eta": "10:30 AM", "flight": "BA254", "transfer": "Airport pickup"},
-      "template": {"code": "ARRIVAL_STANDARD_EN", "name": "Arrival Standard", "language": "English"}
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Aug 1, 2026",
+        "nights": 7,
+        "adults": 2,
+        "children": 1
+      },
+      "transport": {
+        "eta": "10:30 AM",
+        "flight": "BA254",
+        "transfer": "Airport pickup"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
     },
     {
       "id": "arr-2087240",
       "movement": "Arrivals",
       "confirmation_number": "2087240",
+      "salutation": "Ms.",
       "first_name": "Mary",
       "last_name": "Brown",
       "full_name": "Mary Brown",
+      "company": "Brown & Co.",
       "room": "412",
       "vip_level": "Gold",
       "email": "mary.brown@example.com",
-      "stay": {"arrival_date": "Jul 18, 2026", "departure_date": "Jul 22, 2026", "nights": 4, "adults": 2, "children": 0},
-      "transport": {"eta": "11:15 AM", "flight": "AA108", "transfer": "Hotel transfer"},
-      "template": {"code": "ARRIVAL_STANDARD_EN", "name": "Arrival Standard", "language": "English"}
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Jul 29, 2026",
+        "nights": 4,
+        "adults": 2,
+        "children": 0
+      },
+      "transport": {
+        "eta": "11:15 AM",
+        "flight": "AA108",
+        "transfer": "Hotel transfer"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
     },
     {
       "id": "arr-2087241",
       "movement": "Arrivals",
       "confirmation_number": "2087241",
+      "salutation": "Mr.",
       "first_name": "Carlos",
       "last_name": "Lopez",
       "full_name": "Carlos Lopez",
+      "company": "",
       "room": "518",
       "vip_level": "Standard",
       "email": "",
-      "stay": {"arrival_date": "Jul 18, 2026", "departure_date": "Jul 21, 2026", "nights": 3, "adults": 1, "children": 0},
-      "transport": {"eta": "1:40 PM", "flight": "CM260", "transfer": "None"},
-      "template": {"code": "ARRIVAL_STANDARD_ES", "name": "Arrival Standard", "language": "Spanish"}
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Jul 28, 2026",
+        "nights": 3,
+        "adults": 1,
+        "children": 0
+      },
+      "transport": {
+        "eta": "1:40 PM",
+        "flight": "CM260",
+        "transfer": "None"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "missing_email",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "arr-2087242",
+      "movement": "Arrivals",
+      "confirmation_number": "2087242",
+      "salutation": "Mrs.",
+      "first_name": "Sophie",
+      "last_name": "Martin",
+      "full_name": "Sophie Martin",
+      "company": "",
+      "room": "224",
+      "vip_level": "Gold",
+      "email": "sophie.martin@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Jul 31, 2026",
+        "nights": 6,
+        "adults": 2,
+        "children": 2
+      },
+      "transport": {
+        "eta": "2:20 PM",
+        "flight": "AF498",
+        "transfer": "Airport pickup"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "arr-2087243",
+      "movement": "Arrivals",
+      "confirmation_number": "2087243",
+      "salutation": "Mr.",
+      "first_name": "Daniel",
+      "last_name": "Thompson",
+      "full_name": "Daniel Thompson",
+      "company": "Thompson Capital",
+      "room": "603",
+      "vip_level": "Platinum",
+      "email": "daniel.thompson@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Aug 4, 2026",
+        "nights": 10,
+        "adults": 2,
+        "children": 0
+      },
+      "transport": {
+        "eta": "3:05 PM",
+        "flight": "VS197",
+        "transfer": "Private car"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "arr-2087244",
+      "movement": "Arrivals",
+      "confirmation_number": "2087244",
+      "salutation": "Ms.",
+      "first_name": "Aisha",
+      "last_name": "Campbell",
+      "full_name": "Aisha Campbell",
+      "company": "",
+      "room": "118",
+      "vip_level": "Standard",
+      "email": "aisha.campbell@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Jul 30, 2026",
+        "nights": 5,
+        "adults": 1,
+        "children": 0
+      },
+      "transport": {
+        "eta": "3:45 PM",
+        "flight": "BWA451",
+        "transfer": "Hotel transfer"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "arr-2087245",
+      "movement": "Arrivals",
+      "confirmation_number": "2087245",
+      "salutation": "Mr.",
+      "first_name": "Liam",
+      "last_name": "O'Connor",
+      "full_name": "Liam O'Connor",
+      "company": "",
+      "room": "427",
+      "vip_level": "Gold",
+      "email": "liam.oconnor@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Aug 2, 2026",
+        "nights": 8,
+        "adults": 2,
+        "children": 1
+      },
+      "transport": {
+        "eta": "4:30 PM",
+        "flight": "EI31",
+        "transfer": "Airport pickup"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "arr-2087246",
+      "movement": "Arrivals",
+      "confirmation_number": "2087246",
+      "salutation": "Dr.",
+      "first_name": "Helen",
+      "last_name": "Foster",
+      "full_name": "Dr. Helen Foster",
+      "company": "Foster Medical Group",
+      "room": "511",
+      "vip_level": "Platinum",
+      "email": "helen.foster@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Jul 27, 2026",
+        "nights": 2,
+        "adults": 1,
+        "children": 0
+      },
+      "transport": {
+        "eta": "5:10 PM",
+        "flight": "DL1985",
+        "transfer": "Private car"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "arr-2087247",
+      "movement": "Arrivals",
+      "confirmation_number": "2087247",
+      "salutation": "Mr.",
+      "first_name": "Oliver",
+      "last_name": "Grant",
+      "full_name": "Oliver Grant",
+      "company": "",
+      "room": "332",
+      "vip_level": "Standard",
+      "email": "oliver.grant@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Jul 30, 2026",
+        "nights": 5,
+        "adults": 2,
+        "children": 2
+      },
+      "transport": {
+        "eta": "6:25 PM",
+        "flight": "AC1841",
+        "transfer": "Airport pickup"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "arr-2087248",
+      "movement": "Arrivals",
+      "confirmation_number": "2087248",
+      "salutation": "Ms.",
+      "first_name": "Camila",
+      "last_name": "Ribeiro",
+      "full_name": "Camila Ribeiro",
+      "company": "",
+      "room": "208",
+      "vip_level": "Gold",
+      "email": "camila.ribeiro@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 25, 2026",
+        "departure_date": "Jul 29, 2026",
+        "nights": 4,
+        "adults": 2,
+        "children": 0
+      },
+      "transport": {
+        "eta": "8:15 PM",
+        "flight": "G37728",
+        "transfer": "Hotel transfer"
+      },
+      "template": {
+        "code": "ARRIVAL_STANDARD_EN",
+        "name": "Arrival Standard",
+        "language": "English",
+        "file_name": "arrival_standard_en.docx",
+        "document_prefix": "ARRIVAL"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
     },
     {
       "id": "dep-2087180",
       "movement": "Departures",
       "confirmation_number": "2087180",
+      "salutation": "Ms.",
       "first_name": "Emily",
       "last_name": "Davis",
       "full_name": "Emily Davis",
+      "company": "",
       "room": "214",
       "vip_level": "Gold",
       "email": "emily.davis@example.com",
-      "stay": {"arrival_date": "Jul 12, 2026", "departure_date": "Jul 18, 2026", "nights": 6, "adults": 2, "children": 0},
-      "transport": {"eta": "3:00 PM", "flight": "AC1841", "transfer": "Airport transfer"},
-      "template": {"code": "DEPARTURE_STANDARD_EN", "name": "Departure Standard", "language": "English"}
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 19, 2026",
+        "departure_date": "Jul 25, 2026",
+        "nights": 6,
+        "adults": 2,
+        "children": 0
+      },
+      "transport": {
+        "eta": "7:30 AM",
+        "flight": "AC1840",
+        "transfer": "Airport transfer"
+      },
+      "template": {
+        "code": "DEPARTURE_STANDARD_EN",
+        "name": "Departure Standard",
+        "language": "English",
+        "file_name": "departure_standard_en.docx",
+        "document_prefix": "DEPARTURE"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
     },
     {
       "id": "dep-2087181",
       "movement": "Departures",
       "confirmation_number": "2087181",
+      "salutation": "Mr.",
       "first_name": "Robert",
       "last_name": "Wilson",
       "full_name": "Robert Wilson",
+      "company": "",
       "room": "405",
       "vip_level": "Platinum",
       "email": "robert.wilson@example.com",
-      "stay": {"arrival_date": "Jul 10, 2026", "departure_date": "Jul 18, 2026", "nights": 8, "adults": 2, "children": 2},
-      "transport": {"eta": "5:30 PM", "flight": "BA255", "transfer": "Private car"},
-      "template": {"code": "DEPARTURE_STANDARD_EN", "name": "Departure Standard", "language": "English"}
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 17, 2026",
+        "departure_date": "Jul 25, 2026",
+        "nights": 8,
+        "adults": 2,
+        "children": 2
+      },
+      "transport": {
+        "eta": "8:15 AM",
+        "flight": "BA255",
+        "transfer": "Private car"
+      },
+      "template": {
+        "code": "DEPARTURE_STANDARD_EN",
+        "name": "Departure Standard",
+        "language": "English",
+        "file_name": "departure_standard_en.docx",
+        "document_prefix": "DEPARTURE"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "dep-2087182",
+      "movement": "Departures",
+      "confirmation_number": "2087182",
+      "salutation": "Mrs.",
+      "first_name": "Natalie",
+      "last_name": "Green",
+      "full_name": "Natalie Green",
+      "company": "",
+      "room": "129",
+      "vip_level": "Standard",
+      "email": "natalie.green@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 21, 2026",
+        "departure_date": "Jul 25, 2026",
+        "nights": 4,
+        "adults": 2,
+        "children": 1
+      },
+      "transport": {
+        "eta": "9:00 AM",
+        "flight": "AA107",
+        "transfer": "Airport transfer"
+      },
+      "template": {
+        "code": "DEPARTURE_STANDARD_EN",
+        "name": "Departure Standard",
+        "language": "English",
+        "file_name": "departure_standard_en.docx",
+        "document_prefix": "DEPARTURE"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "dep-2087183",
+      "movement": "Departures",
+      "confirmation_number": "2087183",
+      "salutation": "Mr.",
+      "first_name": "James",
+      "last_name": "Anderson",
+      "full_name": "James Anderson",
+      "company": "Anderson Holdings",
+      "room": "517",
+      "vip_level": "Gold",
+      "email": "james.anderson@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 15, 2026",
+        "departure_date": "Jul 25, 2026",
+        "nights": 10,
+        "adults": 1,
+        "children": 0
+      },
+      "transport": {
+        "eta": "10:15 AM",
+        "flight": "VS198",
+        "transfer": "Hotel transfer"
+      },
+      "template": {
+        "code": "DEPARTURE_STANDARD_EN",
+        "name": "Departure Standard",
+        "language": "English",
+        "file_name": "departure_standard_en.docx",
+        "document_prefix": "DEPARTURE"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "dep-2087184",
+      "movement": "Departures",
+      "confirmation_number": "2087184",
+      "salutation": "Ms.",
+      "first_name": "Priya",
+      "last_name": "Patel",
+      "full_name": "Priya Patel",
+      "company": "",
+      "room": "322",
+      "vip_level": "Standard",
+      "email": "priya.patel@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 20, 2026",
+        "departure_date": "Jul 25, 2026",
+        "nights": 5,
+        "adults": 2,
+        "children": 0
+      },
+      "transport": {
+        "eta": "11:45 AM",
+        "flight": "BWA450",
+        "transfer": "None"
+      },
+      "template": {
+        "code": "DEPARTURE_STANDARD_EN",
+        "name": "Departure Standard",
+        "language": "English",
+        "file_name": "departure_standard_en.docx",
+        "document_prefix": "DEPARTURE"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "dep-2087185",
+      "movement": "Departures",
+      "confirmation_number": "2087185",
+      "salutation": "Mr.",
+      "first_name": "Thomas",
+      "last_name": "Becker",
+      "full_name": "Thomas Becker",
+      "company": "",
+      "room": "611",
+      "vip_level": "Platinum",
+      "email": "thomas.becker@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 11, 2026",
+        "departure_date": "Jul 25, 2026",
+        "nights": 14,
+        "adults": 2,
+        "children": 0
+      },
+      "transport": {
+        "eta": "12:30 PM",
+        "flight": "LH440",
+        "transfer": "Private car"
+      },
+      "template": {
+        "code": "DEPARTURE_STANDARD_EN",
+        "name": "Departure Standard",
+        "language": "English",
+        "file_name": "departure_standard_en.docx",
+        "document_prefix": "DEPARTURE"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "dep-2087186",
+      "movement": "Departures",
+      "confirmation_number": "2087186",
+      "salutation": "Mrs.",
+      "first_name": "Lauren",
+      "last_name": "Mitchell",
+      "full_name": "Lauren Mitchell",
+      "company": "",
+      "room": "238",
+      "vip_level": "Gold",
+      "email": "lauren.mitchell@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 18, 2026",
+        "departure_date": "Jul 25, 2026",
+        "nights": 7,
+        "adults": 2,
+        "children": 2
+      },
+      "transport": {
+        "eta": "1:20 PM",
+        "flight": "DL1984",
+        "transfer": "Airport transfer"
+      },
+      "template": {
+        "code": "DEPARTURE_STANDARD_EN",
+        "name": "Departure Standard",
+        "language": "English",
+        "file_name": "departure_standard_en.docx",
+        "document_prefix": "DEPARTURE"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
+    },
+    {
+      "id": "dep-2087187",
+      "movement": "Departures",
+      "confirmation_number": "2087187",
+      "salutation": "Mr.",
+      "first_name": "Miguel",
+      "last_name": "Santos",
+      "full_name": "Miguel Santos",
+      "company": "Santos International",
+      "room": "416",
+      "vip_level": "Standard",
+      "email": "miguel.santos@example.com",
+      "letter_date": "25 July 2026",
+      "stay": {
+        "arrival_date": "Jul 22, 2026",
+        "departure_date": "Jul 25, 2026",
+        "nights": 3,
+        "adults": 1,
+        "children": 0
+      },
+      "transport": {
+        "eta": "2:45 PM",
+        "flight": "CM261",
+        "transfer": "Hotel transfer"
+      },
+      "template": {
+        "code": "DEPARTURE_STANDARD_EN",
+        "name": "Departure Standard",
+        "language": "English",
+        "file_name": "departure_standard_en.docx",
+        "document_prefix": "DEPARTURE"
+      },
+      "document": {
+        "status": "not_generated",
+        "generated_file_name": null,
+        "generated_at": null,
+        "opened_in_word_at": null
+      },
+      "communication": {
+        "status": "ready",
+        "last_sent_at": null
+      }
     }
   ]
 }
