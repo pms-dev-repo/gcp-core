@@ -1,0 +1,74 @@
+{
+  "guests": [
+    {
+      "id": "arr-2087239",
+      "movement": "Arrivals",
+      "confirmation_number": "2087239",
+      "first_name": "John",
+      "last_name": "Smith",
+      "full_name": "John Smith",
+      "room": "306",
+      "vip_level": "Platinum",
+      "email": "john.smith@example.com",
+      "stay": {"arrival_date": "Jul 18, 2026", "departure_date": "Jul 25, 2026", "nights": 7, "adults": 2, "children": 1},
+      "transport": {"eta": "10:30 AM", "flight": "BA254", "transfer": "Airport pickup"},
+      "template": {"code": "ARRIVAL_STANDARD_EN", "name": "Arrival Standard", "language": "English"}
+    },
+    {
+      "id": "arr-2087240",
+      "movement": "Arrivals",
+      "confirmation_number": "2087240",
+      "first_name": "Mary",
+      "last_name": "Brown",
+      "full_name": "Mary Brown",
+      "room": "412",
+      "vip_level": "Gold",
+      "email": "mary.brown@example.com",
+      "stay": {"arrival_date": "Jul 18, 2026", "departure_date": "Jul 22, 2026", "nights": 4, "adults": 2, "children": 0},
+      "transport": {"eta": "11:15 AM", "flight": "AA108", "transfer": "Hotel transfer"},
+      "template": {"code": "ARRIVAL_STANDARD_EN", "name": "Arrival Standard", "language": "English"}
+    },
+    {
+      "id": "arr-2087241",
+      "movement": "Arrivals",
+      "confirmation_number": "2087241",
+      "first_name": "Carlos",
+      "last_name": "Lopez",
+      "full_name": "Carlos Lopez",
+      "room": "518",
+      "vip_level": "Standard",
+      "email": "",
+      "stay": {"arrival_date": "Jul 18, 2026", "departure_date": "Jul 21, 2026", "nights": 3, "adults": 1, "children": 0},
+      "transport": {"eta": "1:40 PM", "flight": "CM260", "transfer": "None"},
+      "template": {"code": "ARRIVAL_STANDARD_ES", "name": "Arrival Standard", "language": "Spanish"}
+    },
+    {
+      "id": "dep-2087180",
+      "movement": "Departures",
+      "confirmation_number": "2087180",
+      "first_name": "Emily",
+      "last_name": "Davis",
+      "full_name": "Emily Davis",
+      "room": "214",
+      "vip_level": "Gold",
+      "email": "emily.davis@example.com",
+      "stay": {"arrival_date": "Jul 12, 2026", "departure_date": "Jul 18, 2026", "nights": 6, "adults": 2, "children": 0},
+      "transport": {"eta": "3:00 PM", "flight": "AC1841", "transfer": "Airport transfer"},
+      "template": {"code": "DEPARTURE_STANDARD_EN", "name": "Departure Standard", "language": "English"}
+    },
+    {
+      "id": "dep-2087181",
+      "movement": "Departures",
+      "confirmation_number": "2087181",
+      "first_name": "Robert",
+      "last_name": "Wilson",
+      "full_name": "Robert Wilson",
+      "room": "405",
+      "vip_level": "Platinum",
+      "email": "robert.wilson@example.com",
+      "stay": {"arrival_date": "Jul 10, 2026", "departure_date": "Jul 18, 2026", "nights": 8, "adults": 2, "children": 2},
+      "transport": {"eta": "5:30 PM", "flight": "BA255", "transfer": "Private car"},
+      "template": {"code": "DEPARTURE_STANDARD_EN", "name": "Departure Standard", "language": "English"}
+    }
+  ]
+}
