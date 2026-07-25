@@ -17,6 +17,8 @@ def initialize_state(guests: list[dict[str, Any]]) -> None:
     default_date = _tomorrow_in_barbados()
     defaults = {
         "selected_guest_id": None,
+        "sidebar_open": True,
+        "active_page": "communications",
         "document_status": {},
         "generated_documents": {},
         "activity": {},

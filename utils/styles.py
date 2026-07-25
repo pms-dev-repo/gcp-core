@@ -1010,6 +1010,276 @@ button::before{
     }
 }
 
+        
+
+/* ==========================================================
+   OPERA CLOUD INSPIRED HEADER + SIDEBAR - FIXED
+========================================================== */
+
+[data-testid="stHeader"]{
+    display:none !important;
+}
+
+[data-testid="stMainBlockContainer"]{
+    padding-top:0 !important;
+}
+
+.block-container{
+    max-width:100% !important;
+    padding:8px 16px 2rem !important;
+}
+
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"]{
+    background:#ffffff !important;
+}
+
+/* One continuous header bar */
+.gcp-header{
+    position:relative;
+    width:100%;
+    height:44px;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px 0 66px;
+    margin:0 0 14px;
+    background:#30364c;
+    color:#ffffff;
+    overflow:hidden;
+}
+
+.gcp-header-left,
+.gcp-header-right,
+.gcp-user{
+    display:flex;
+    align-items:center;
+}
+
+.gcp-header-left{gap:8px; min-width:0;}
+.gcp-header-right{gap:17px; margin-left:auto;}
+.gcp-user{gap:12px;}
+
+.gcp-brand{
+    color:#ffffff;
+    font-size:28px;
+    font-weight:700;
+    line-height:1;
+    letter-spacing:.7px;
+    white-space:nowrap;
+}
+
+.gcp-divider{
+    width:1px;
+    height:20px;
+    background:rgba(255,255,255,.35);
+}
+
+.gcp-product-name{
+    color:#ffffff;
+    font-size:16px;
+    white-space:nowrap;
+}
+
+.gcp-date-time{text-align:right; line-height:1.15; white-space:nowrap;}
+.gcp-date{color:#ffffff; font-size:12px; font-weight:600;}
+.gcp-time{color:#d9dce6; font-size:12px; margin-top:2px;}
+
+.gcp-avatar{
+    width:28px;
+    height:28px;
+    border-radius:6px;
+    background:#69728f;
+    color:#ffffff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:600;
+}
+
+.gcp-user-info{line-height:1.12; white-space:nowrap;}
+.gcp-hotel,.gcp-username{color:#ffffff; font-size:12px; font-weight:600;}
+
+/* Burger floats over the continuous header */
+div[data-testid="stButton"] button[title="Show or hide navigation"],
+div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
+    position:absolute !important;
+    top:8px !important;
+    left:16px !important;
+    z-index:1002 !important;
+    width:50px !important;
+    min-width:50px !important;
+    height:44px !important;
+    min-height:44px !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:#3c425a !important;
+    color:#ffffff !important;
+    box-shadow:none !important;
+    font-size:22px !important;
+}
+
+div[data-testid="stButton"] button[title="Show or hide navigation"]:hover,
+div[data-testid="stButton"] button[aria-label="Show or hide navigation"]:hover{
+    background:#4a516b !important;
+    transform:none !important;
+}
+
+.gcp-sidebar-open,.gcp-sidebar-closed{display:none;}
+
+/* Native Streamlit sidebar restyled as OPERA navigation */
+[data-testid="stSidebar"]{
+    width:250px !important;
+    min-width:250px !important;
+    background:#3c425a !important;
+    border-right:1px solid rgba(0,0,0,.22) !important;
+    transition:width .22s ease, min-width .22s ease, transform .22s ease !important;
+    overflow:hidden !important;
+}
+
+[data-testid="stSidebar"] > div:first-child{
+    width:250px !important;
+    background:#3c425a !important;
+    padding-top:12px !important;
+}
+
+[data-testid="stSidebarContent"]{
+    background:#3c425a !important;
+    padding:10px 0 24px !important;
+}
+
+[data-testid="stSidebarCollapseButton"],
+[data-testid="collapsedControl"]{
+    display:none !important;
+}
+
+/* Our burger controls this state. */
+body:has(.gcp-sidebar-closed) [data-testid="stSidebar"]{
+    width:0 !important;
+    min-width:0 !important;
+    transform:translateX(-250px) !important;
+    border-right:0 !important;
+}
+
+body:has(.gcp-sidebar-closed) [data-testid="stSidebar"] > div:first-child{
+    width:250px !important;
+}
+
+.gcp-sidebar-root{display:none;}
+
+.gcp-sidebar-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:4px 14px 14px;
+    color:#ffffff;
+}
+
+.gcp-sidebar-brand-icon{
+    width:34px;
+    height:34px;
+    border-radius:7px;
+    background:#ffffff;
+    color:#3c425a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+}
+
+.gcp-sidebar-brand-title{font-size:14px; font-weight:700;}
+.gcp-sidebar-brand-subtitle{color:#cfd3df; font-size:10px; margin-top:2px;}
+
+.gcp-sidebar-search{
+    height:34px;
+    margin:0 12px 14px;
+    padding:0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#ffffff;
+    color:#7b8190;
+    border-radius:3px;
+    font-size:12px;
+}
+
+.gcp-sidebar-section-label{
+    color:#f2cf62;
+    font-size:10px;
+    font-weight:700;
+    padding:7px 14px 5px;
+    letter-spacing:.4px;
+}
+
+.gcp-sidebar-section-spaced{margin-top:10px;}
+.gcp-sidebar-divider{height:1px; background:rgba(255,255,255,.12); margin:14px 0 10px;}
+
+[data-testid="stSidebar"] div[data-testid="stButton"]{margin:0 !important;}
+[data-testid="stSidebar"] div[data-testid="stButton"] button{
+    min-height:42px !important;
+    width:100% !important;
+    border-radius:0 !important;
+    justify-content:flex-start !important;
+    padding:0 14px !important;
+    background:#3c425a !important;
+    color:#e5e7ef !important;
+    box-shadow:none !important;
+    border-top:1px solid rgba(255,255,255,.04) !important;
+    border-bottom:1px solid rgba(0,0,0,.10) !important;
+    font-size:12px !important;
+    font-weight:600 !important;
+}
+
+[data-testid="stSidebar"] div[data-testid="stButton"] button:hover{
+    background:#4a516b !important;
+    color:#ffffff !important;
+    transform:none !important;
+}
+
+[data-testid="stSidebar"] div[data-testid="stElementContainer"]:has(.sidebar-nav-marker.active)
++ div[data-testid="stElementContainer"] button{
+    background:#515973 !important;
+    color:#ffffff !important;
+    box-shadow:inset 4px 0 0 #f2cf62 !important;
+}
+.sidebar-nav-marker{display:none;}
+
+/* Restore clear borders on all date picker controls. */
+div[data-testid="stDateInput"] [data-baseweb="input"],
+div[data-testid="stDateInput"] > div > div{
+    background:#ffffff !important;
+    border:1px solid #aeb4bc !important;
+    border-radius:4px !important;
+    box-shadow:none !important;
+}
+
+div[data-testid="stDateInput"] [data-baseweb="input"]:focus-within,
+div[data-testid="stDateInput"] > div > div:focus-within{
+    border-color:#3b82f6 !important;
+    box-shadow:0 0 0 1px #3b82f6 !important;
+}
+
+div[data-testid="stDateInput"] input{
+    border:0 !important;
+    background:transparent !important;
+    color:#111827 !important;
+}
+
+@media (max-width:900px){
+    .gcp-product-name,.gcp-hotel,.gcp-time{display:none;}
+    .gcp-header{padding-left:62px; padding-right:10px;}
+    [data-testid="stSidebar"]{
+        position:fixed !important;
+        z-index:1001 !important;
+        height:100vh !important;
+    }
+}
+
+
         </style>
         """,
         unsafe_allow_html=True,

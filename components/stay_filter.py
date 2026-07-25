@@ -32,7 +32,7 @@ def render_stay_filter() -> None:
         """
         <div class="stay-filter-heading">
             <div>
-                <div class="stay-filter-title">Stay Date Filter</div>
+                <div class="stay-filter-title">Date Filter</div>
                 <div class="stay-filter-subtitle">
                     Select the arrival and departure date ranges to load guests.
                 </div>

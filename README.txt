@@ -1,19 +1,17 @@
-GCP - Single PDF Button Update
+GCP OPERA Cloud-style Sidebar
 
-Replace:
-- components/workflow.py
-- services/document_service.py
+Replace/add:
+- app.py
+- components/header.py
+- components/sidebar.py   (new)
+- utils/state.py
+- utils/styles.py
 
-Add to requirements.txt:
-docx2pdf>=0.1.8
+Sidebar:
+- Fill color: #3c425a
+- Burger button opens/closes the sidebar
+- Active menu item is highlighted
+- Guest Communications is the default page
+- Other menu items show a placeholder until their modules are built
 
-New PDF behavior:
-- Only one PDF button is displayed: Open Final PDF.
-- Clicking it converts the edited DOCX to PDF using Microsoft Word.
-- The generated PDF opens in a new browser tab.
-- The original Word formatting is preserved.
-
-Requirements:
-- Run Streamlit locally on Windows.
-- Microsoft Word must be installed.
-- Save the edited DOCX in Word before clicking Open Final PDF.
+No new Python dependencies are required.
