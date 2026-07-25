@@ -791,6 +791,225 @@ div[data-testid="stDateInput"] input{
     }
 }
 
+        /* ===========================
+           EMPTY WORKSPACE
+        =========================== */
+
+        .empty-workspace-card{
+            background:#ffffff;
+            border:1px solid #d9dde5;
+            border-radius:12px;
+            padding:52px 28px;
+            margin-bottom:26px;
+            text-align:center;
+            box-shadow:0 2px 8px rgba(0,0,0,.04);
+        }
+
+        .empty-workspace-secondary{
+            padding:30px 28px;
+        }
+
+        .empty-workspace-icon{
+            width:54px;
+            height:54px;
+            margin:0 auto 16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:50%;
+            background:rgba(0,104,140,.10);
+            color:rgb(0,104,140);
+            font-size:25px;
+            font-weight:700;
+        }
+
+        .empty-workspace-title{
+            color:#111827;
+            font-size:20px;
+            font-weight:750;
+            margin-bottom:8px;
+        }
+
+        .empty-workspace-text,
+        .empty-workspace-placeholder{
+            max-width:590px;
+            margin:0 auto;
+            color:#6b7280;
+            font-size:13px;
+            line-height:1.6;
+        }
+
+        .empty-workspace-section-title{
+            color:#111827;
+            font-size:16px;
+            font-weight:700;
+            margin-bottom:10px;
+        }
+
+        
+
+/* ==========================================================
+   FINAL BUTTON ALIGNMENT AND CONSISTENT RADIUS
+========================================================== */
+
+/* Bring date labels closer to their date controls. */
+.date-group-label{
+    min-height:44px !important;
+    padding-top:9px !important;
+    justify-content:flex-start !important;
+}
+
+/* Compact spacing in the Stay Date Filter rows. */
+.stay-filter-heading + div [data-testid="stForm"] [data-testid="stHorizontalBlock"]{
+    gap:0.70rem !important;
+}
+
+.stay-filter-heading + div [data-testid="stForm"]{
+    padding:2px 18px 14px !important;
+}
+
+/* Search and Load Guests use the same corner radius. */
+div[data-testid="stFormSubmitButton"] button{
+    border-radius:6px !important;
+}
+
+/* Keep the Guest Search button compact. */
+div[data-testid="stForm"]:not(:has(div[data-testid="stDateInput"]))
+div[data-testid="stFormSubmitButton"] button{
+    width:96px !important;
+    min-width:96px !important;
+    max-width:96px !important;
+    padding:0 14px !important;
+    border-radius:6px !important;
+}
+
+/* Give Load Guests its own width and prevent clipping. */
+div[data-testid="stForm"]:has(div[data-testid="stDateInput"])
+div[data-testid="stFormSubmitButton"]{
+    width:100% !important;
+    display:flex !important;
+    justify-content:center !important;
+}
+
+div[data-testid="stForm"]:has(div[data-testid="stDateInput"])
+div[data-testid="stFormSubmitButton"] button{
+    width:100% !important;
+    min-width:145px !important;
+    max-width:none !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 18px !important;
+    white-space:nowrap !important;
+    overflow:visible !important;
+    border-radius:6px !important;
+}
+
+/* All primary action buttons share the same radius. */
+div[data-testid="stButton"] button,
+div[data-testid="stDownloadButton"] button{
+    border-radius:6px !important;
+}
+
+        
+
+/* ==========================================================
+   GCP GUIDED WORKFLOW
+========================================================== */
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.workflow-card-marker){
+    position:relative;
+    background:#ffffff !important;
+    border:1px solid #d9dde5 !important;
+    border-radius:12px !important;
+    padding:28px 20px 22px !important;
+    margin-bottom:26px !important;
+    overflow:hidden !important;
+    box-shadow:0 2px 8px rgba(0,0,0,.04) !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.workflow-card-marker)::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:5px;
+    background:rgb(22,21,19);
+}
+
+.workflow-card-marker,
+.word-action-marker{
+    display:none;
+}
+
+.workflow-title{
+    margin-bottom:18px !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.workflow-card-marker)
+div[data-testid="stButton"],
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.workflow-card-marker)
+div[data-testid="stDownloadButton"]{
+    margin-bottom:10px !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.workflow-card-marker)
+div[data-testid="stButton"] button,
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.workflow-card-marker)
+div[data-testid="stDownloadButton"] button{
+    width:100% !important;
+    min-height:42px !important;
+    border-radius:6px !important;
+    justify-content:center !important;
+    white-space:nowrap !important;
+}
+
+/* Custom Microsoft Word icon for the Word action. */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.word-action-marker)
+button::before{
+    content:"W";
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    margin-right:8px;
+    border-radius:4px;
+    background:#185abd;
+    color:#ffffff;
+    font-size:13px;
+    font-weight:800;
+    box-shadow:inset -5px 0 0 rgba(255,255,255,.10);
+}
+
+.m365-word-logo{
+    width:42px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:6px;
+    background:#185abd;
+    color:#ffffff;
+    font-size:22px;
+    font-weight:800;
+    box-shadow:inset -8px 0 0 rgba(255,255,255,.10),
+               0 4px 12px rgba(24,90,189,.25);
+}
+
+.workflow-status-title{
+    color:#111827;
+    font-size:14px;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+@media (max-width:900px){
+    div[data-testid="stVerticalBlockBorderWrapper"]:has(.workflow-card-marker){
+        padding:24px 14px 18px !important;
+    }
+}
+
         </style>
         """,
         unsafe_allow_html=True,

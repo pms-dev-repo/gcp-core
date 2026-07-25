@@ -139,3 +139,65 @@ def read_generated_document(path_value: str | Path) -> bytes:
     if not path.exists() or not path.is_file():
         raise FileNotFoundError(f"Generated document not found: {path}")
     return path.read_bytes()
+
+
+def generate_guest_pdf(docx_path_value: str | Path) -> Path:
+    """
+    Convert the edited DOCX to PDF using Microsoft Word.
+
+    This preserves the Word document layout, fonts, images, headers, footers,
+    tables, and other formatting. It is intended for local Windows execution
+    where Microsoft Word is installed.
+    """
+    try:
+        from docx2pdf import convert
+    except ImportError as exc:
+        raise RuntimeError(
+            "PDF generation requires docx2pdf. "
+            "Install it with: pip install docx2pdf"
+        ) from exc
+
+    docx_path = Path(docx_path_value).resolve()
+
+    if not docx_path.exists() or not docx_path.is_file():
+        raise FileNotFoundError(
+            f"Generated Word document not found: {docx_path}"
+        )
+
+    if docx_path.suffix.lower() != ".docx":
+        raise ValueError("Only DOCX files can be converted to PDF.")
+
+    pdf_path = docx_path.with_suffix(".pdf")
+
+    try:
+        convert(str(docx_path), str(pdf_path))
+    except Exception as exc:
+        raise OSError(
+            "Microsoft Word could not convert the document to PDF. "
+            "Confirm that Word is installed and that the DOCX is not open "
+            "with unsaved changes."
+        ) from exc
+
+    if not pdf_path.exists():
+        raise OSError("The PDF file was not created.")
+
+    return pdf_path
+
+
+def open_pdf_in_new_tab(pdf_path_value: str | Path) -> None:
+    """
+    Open a local PDF in the user's default browser.
+
+    This works when Streamlit is running locally on the same computer as the
+    browser, which is the current GCP demo setup.
+    """
+    import webbrowser
+
+    pdf_path = Path(pdf_path_value).resolve()
+
+    if not pdf_path.exists() or not pdf_path.is_file():
+        raise FileNotFoundError(f"PDF file not found: {pdf_path}")
+
+    opened = webbrowser.open_new_tab(pdf_path.as_uri())
+    if not opened:
+        raise OSError("The browser could not open the PDF in a new tab.")

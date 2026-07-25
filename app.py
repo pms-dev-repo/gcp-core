@@ -36,9 +36,30 @@ left, right = st.columns([0.23, 0.77], gap="large")
 with left:
     render_guest_list(filtered_guests)
 with right:
-    if filtered_guests:
-        render_workspace(filtered_guests)
-    else:
+    if not filtered_guests:
         st.info(
             "No arrivals or departures were found for the selected date ranges."
         )
+    elif st.session_state.selected_guest_id is None:
+        st.markdown(
+            """
+            <div class="empty-workspace-card">
+                <div class="empty-workspace-icon">▤</div>
+                <div class="empty-workspace-title">Please select a reservation</div>
+                <div class="empty-workspace-text">
+                    Choose an arrival or departure from the Guest List to view
+                    the reservation details and communication workflow.
+                </div>
+            </div>
+            <div class="empty-workspace-card empty-workspace-secondary">
+                <div class="empty-workspace-section-title">Document & Communication</div>
+                <div class="empty-workspace-placeholder">
+                    Please select a reservation to generate a letter, open it in
+                    Microsoft Word 365, or send an email.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        render_workspace(filtered_guests)

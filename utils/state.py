@@ -16,7 +16,7 @@ def _tomorrow_in_barbados():
 def initialize_state(guests: list[dict[str, Any]]) -> None:
     default_date = _tomorrow_in_barbados()
     defaults = {
-        "selected_guest_id": guests[0]["id"] if guests else None,
+        "selected_guest_id": None,
         "document_status": {},
         "generated_documents": {},
         "activity": {},
@@ -40,10 +40,14 @@ def initialize_state(guests: list[dict[str, Any]]) -> None:
 
 
 def ensure_selected_guest(guests: list[dict[str, Any]]) -> None:
-    """Keep the selected guest valid after a date filter is applied."""
+    """Clear a selection that is no longer available after filtering."""
+    selected_guest_id = st.session_state.get("selected_guest_id")
+    if selected_guest_id is None:
+        return
+
     available_ids = {guest["id"] for guest in guests}
-    if st.session_state.get("selected_guest_id") not in available_ids:
-        st.session_state.selected_guest_id = guests[0]["id"] if guests else None
+    if selected_guest_id not in available_ids:
+        st.session_state.selected_guest_id = None
 
 
 def add_activity(guest_id: str, message: str) -> None:

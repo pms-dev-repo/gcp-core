@@ -20,7 +20,7 @@ def can_open_desktop_word() -> bool:
 
 
 def open_in_word_365(document_path: Path) -> str:
-    """Open a generated DOCX in the desktop copy of Microsoft Word."""
+    """Open a generated DOCX for editing in Microsoft Word."""
     document_path = Path(document_path).resolve()
 
     if not document_path.exists():

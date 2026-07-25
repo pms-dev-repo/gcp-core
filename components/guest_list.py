@@ -56,29 +56,34 @@ def _render_movement(
         confirmation = guest.get("confirmation_number") or "—"
         eta = guest.get("transport", {}).get("eta") or "—"
 
-        st.markdown(
-            f"""
-            <div class="{css_class}">
-                <div class="guest-name">{full_name}</div>
-                <div class="guest-meta">
-                    Room {room} · Confirmation {confirmation}
+        with st.container(border=True):
+            st.markdown(
+                '<span class="guest-card-marker"></span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f"""
+                <div class="{css_class}">
+                    <div class="guest-name">{full_name}</div>
+                    <div class="guest-meta">
+                        Room {room} · Confirmation {confirmation}
+                    </div>
+                    <div class="guest-meta">ETA {eta}</div>
+                    {status_badge(get_status(guest))}
                 </div>
-                <div class="guest-meta">ETA {eta}</div>
-                {status_badge(get_status(guest))}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+                """,
+                unsafe_allow_html=True,
+            )
 
-        if st.button(
-            "Selected" if selected else "Select",
-            key=f"select_{movement}_{guest_id}",
-            type="primary" if selected else "secondary",
-            disabled=selected,
-            use_container_width=True,
-        ):
-            st.session_state.selected_guest_id = guest_id
-            st.rerun()
+            if st.button(
+                "Selected" if selected else "Select",
+                key=f"select_{movement}_{guest_id}",
+                type="primary" if selected else "secondary",
+                disabled=selected,
+                use_container_width=True,
+            ):
+                st.session_state.selected_guest_id = guest_id
+                st.rerun()
 
 
 def _render_guest_search() -> str:
@@ -150,7 +155,9 @@ def render_guest_list(guests: list[dict[str, Any]]) -> None:
     )
 
     with arrivals_tab:
-        _render_movement(guests, "Arrivals", search)
+        with st.container(height=680, border=False):
+            _render_movement(guests, "Arrivals", search)
 
     with departures_tab:
-        _render_movement(guests, "Departures", search)
+        with st.container(height=680, border=False):
+            _render_movement(guests, "Departures", search)
