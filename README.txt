@@ -1,36 +1,19 @@
-GCP Template Studio v1.9
+GCP Sidebar Submenu v1.10
 
-Included files
---------------
-app.py
+Replace:
 components/sidebar.py
-components/administration.py
-components/template_management.py
 
-What this version adds
-----------------------
-- New Template Studio item under MANAGEMENT.
-- Template metrics and searchable template list.
-- Demo templates for:
-  - Arrival
-  - Departure
-  - Birthday
-  - Anniversary
-  - VIP
-  - Special Events
-- Template details, available variables and document preview.
-- Demo actions: New, Edit, Duplicate, Activate/Deactivate and Archive.
-- New role permissions:
-  - Use Templates
-  - Manage Templates
-- IT Support and General Manager can manage templates.
-- Front Desk can use templates.
+Included changes:
+- Guest Letters is now a parent menu.
+- Arrivals and Departures appears as an indented submenu.
+- Existing active_page='communications' is preserved.
+- Future modules are controlled by True/False flags:
+  Birthdays, Anniversaries, VIP Guests, Special Events,
+  Room Ready and Room Upgrades.
 
-Installation
-------------
-Replace the included files in the matching project paths.
+Example:
+SHOW_BIRTHDAYS = True
 
-Then restart Streamlit:
-streamlit run app.py
-
-No new dependencies are required.
+Note:
+Showing a future item only adds it to the sidebar. Its page route
+must be added to app.py when that module is developed.

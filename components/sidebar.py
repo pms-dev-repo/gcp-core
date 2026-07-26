@@ -4,26 +4,50 @@ import streamlit as st
 
 
 # ==========================================================
-# TEMPORARY SIDEBAR VISIBILITY FLAGS
+# SIDEBAR VISIBILITY FLAGS
 # Change any value to True when that module is ready.
 # ==========================================================
 
+# MAIN
 SHOW_DASHBOARD = False
-SHOW_TEMPLATES = True
 SHOW_HISTORY = False
+
+# GUEST LETTERS SUBMENU
+SHOW_ARRIVALS_DEPARTURES = True
+SHOW_BIRTHDAYS = False
+SHOW_ANNIVERSARIES = False
+SHOW_VIP_GUESTS = False
+SHOW_SPECIAL_EVENTS = False
+SHOW_ROOM_READY = False
+SHOW_ROOM_UPGRADES = False
+
+# MANAGEMENT
+SHOW_TEMPLATES = True
 SHOW_ADMINISTRATION = True
 SHOW_SETTINGS = False
+
+# HELP
 SHOW_HELP = False
 SHOW_ABOUT = True
 
+# OPTIONAL SIDEBAR ELEMENTS
 SHOW_BRANDING = False
 SHOW_SEARCH = False
 
 
 PRIMARY_ITEMS = [
     ("▣", "Dashboard", "dashboard", SHOW_DASHBOARD),
-    ("✉", "Guest Letters", "communications", True),
     ("◷", "Communication History", "history", SHOW_HISTORY),
+]
+
+GUEST_LETTER_ITEMS = [
+    ("✈", "Arrivals and Departures", "communications", SHOW_ARRIVALS_DEPARTURES),
+    ("🎂", "Birthdays", "birthdays", SHOW_BIRTHDAYS),
+    ("💍", "Anniversaries", "anniversaries", SHOW_ANNIVERSARIES),
+    ("★", "VIP Guests", "vip_guests", SHOW_VIP_GUESTS),
+    ("🎉", "Special Events", "special_events", SHOW_SPECIAL_EVENTS),
+    ("🔔", "Room Ready", "room_ready", SHOW_ROOM_READY),
+    ("⬆", "Room Upgrades", "room_upgrades", SHOW_ROOM_UPGRADES),
 ]
 
 ADMIN_ITEMS = [
@@ -36,6 +60,21 @@ HELP_ITEMS = [
     ("?", "Help", "help", SHOW_HELP),
     ("ⓘ", "About GCP", "about", SHOW_ABOUT),
 ]
+
+
+def _visible_items(
+    items: list[tuple[str, str, str, bool]],
+) -> list[tuple[str, str, str]]:
+    return [
+        (icon, label, page_key)
+        for icon, label, page_key, visible in items
+        if visible
+    ]
+
+
+def _set_active_page(page_key: str) -> None:
+    st.session_state.active_page = page_key
+    st.rerun()
 
 
 def _nav_button(icon: str, label: str, page_key: str) -> None:
@@ -52,20 +91,59 @@ def _nav_button(icon: str, label: str, page_key: str) -> None:
         use_container_width=True,
         type="secondary",
     ):
-        st.session_state.active_page = page_key
-        st.rerun()
+        _set_active_page(page_key)
 
 
-def _visible_items(items: list[tuple[str, str, str, bool]]) -> list[tuple[str, str, str]]:
-    return [
-        (icon, label, page_key)
-        for icon, label, page_key, visible in items
-        if visible
-    ]
+def _submenu_button(icon: str, label: str, page_key: str) -> None:
+    active = st.session_state.get("active_page", "communications") == page_key
+
+    _, button_col = st.columns([0.10, 0.90], gap="small")
+
+    with button_col:
+        st.markdown(
+            f'<span class="sidebar-nav-marker {"active" if active else ""}"></span>',
+            unsafe_allow_html=True,
+        )
+
+        if st.button(
+            f"{icon}  {label}",
+            key=f"sidebar_submenu_{page_key}",
+            use_container_width=True,
+            type="secondary",
+        ):
+            _set_active_page(page_key)
+
+
+def _render_guest_letters_group(
+    items: list[tuple[str, str, str]],
+) -> None:
+    if not items:
+        return
+
+    st.markdown(
+        """
+        <div style="
+            margin-top:4px;
+            margin-bottom:3px;
+            padding:7px 10px 3px 10px;
+            color:#374151;
+            font-size:14px;
+            font-weight:700;
+            letter-spacing:0.01em;
+        ">
+            ✉&nbsp;&nbsp;Guest Letters
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    for item in items:
+        _submenu_button(*item)
 
 
 def render_sidebar() -> None:
     primary_items = _visible_items(PRIMARY_ITEMS)
+    guest_letter_items = _visible_items(GUEST_LETTER_ITEMS)
     admin_items = _visible_items(ADMIN_ITEMS)
     help_items = _visible_items(HELP_ITEMS)
 
@@ -78,7 +156,9 @@ def render_sidebar() -> None:
                 <div class="gcp-sidebar-brand-icon">G</div>
                 <div>
                     <div class="gcp-sidebar-brand-title">GCP</div>
-                    <div class="gcp-sidebar-brand-subtitle">Communication Platform</div>
+                    <div class="gcp-sidebar-brand-subtitle">
+                        Communication Platform
+                    </div>
                 </div>
             </div>
             """,
@@ -99,7 +179,7 @@ def render_sidebar() -> None:
     if not SHOW_BRANDING and not SHOW_SEARCH:
         st.markdown("<div style='height:10px'></div>", unsafe_allow_html=True)
 
-    if primary_items:
+    if primary_items or guest_letter_items:
         st.markdown(
             '<div class="gcp-sidebar-section-label">MAIN</div>',
             unsafe_allow_html=True,
@@ -108,11 +188,12 @@ def render_sidebar() -> None:
         for item in primary_items:
             _nav_button(*item)
 
+        _render_guest_letters_group(guest_letter_items)
+
     if admin_items:
         st.markdown(
-            '<div class="gcp-sidebar-section-label gcp-sidebar-section-spaced">'
-            'MANAGEMENT'
-            '</div>',
+            '<div class="gcp-sidebar-section-label '
+            'gcp-sidebar-section-spaced">MANAGEMENT</div>',
             unsafe_allow_html=True,
         )
 
