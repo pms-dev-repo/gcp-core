@@ -5,7 +5,14 @@ from typing import Any
 import streamlit as st
 
 from components.status import status_badge
-from utils.state import get_status
+from utils.state import (
+    clear_bulk_selection,
+    get_bulk_selection_version,
+    get_selected_guest_ids,
+    get_status,
+    set_bulk_selection,
+    toggle_bulk_guest,
+)
 
 
 def _matches_search(guest: dict[str, Any], search: str) -> bool:
@@ -26,6 +33,68 @@ def _matches_search(guest: dict[str, Any], search: str) -> bool:
     return any(term in str(value).casefold() for value in searchable_values)
 
 
+def _sync_single_selection() -> None:
+    """
+    Keep the original single-guest workflow compatible with bulk selection.
+
+    When exactly one reservation remains selected, it becomes the active guest.
+    When two or more are selected, the workspace switches to bulk mode.
+    """
+    selected_ids = list(get_selected_guest_ids())
+
+    if len(selected_ids) == 1:
+        st.session_state.selected_guest_id = selected_ids[0]
+    elif len(selected_ids) == 0:
+        st.session_state.selected_guest_id = None
+
+
+def _select_all_visible(filtered: list[dict[str, Any]]) -> None:
+    visible_ids = {guest["id"] for guest in filtered}
+    selected_ids = get_selected_guest_ids()
+    set_bulk_selection(selected_ids | visible_ids)
+    _sync_single_selection()
+
+
+def _clear_visible(filtered: list[dict[str, Any]]) -> None:
+    visible_ids = {guest["id"] for guest in filtered}
+    selected_ids = get_selected_guest_ids()
+    set_bulk_selection(selected_ids - visible_ids)
+    _sync_single_selection()
+
+
+def _render_bulk_controls(filtered: list[dict[str, Any]], movement: str) -> None:
+    selected_ids = get_selected_guest_ids()
+    visible_ids = {guest["id"] for guest in filtered}
+    selected_visible = len(selected_ids & visible_ids)
+
+    st.caption(
+        f"{selected_visible} selected in {movement.lower()} · "
+        f"{len(selected_ids)} selected total"
+    )
+
+    select_col, clear_col = st.columns(2, gap="small")
+
+    with select_col:
+        if st.button(
+            "Select All",
+            key=f"bulk_select_all_{movement}",
+            use_container_width=True,
+            disabled=not filtered or visible_ids.issubset(selected_ids),
+        ):
+            _select_all_visible(filtered)
+            st.rerun()
+
+    with clear_col:
+        if st.button(
+            "Clear",
+            key=f"bulk_clear_{movement}",
+            use_container_width=True,
+            disabled=selected_visible == 0,
+        ):
+            _clear_visible(filtered)
+            st.rerun()
+
+
 def _render_movement(
     guests: list[dict[str, Any]],
     movement: str,
@@ -42,12 +111,22 @@ def _render_movement(
         st.info("No guests match the current search.")
         return
 
+    _render_bulk_controls(filtered, movement)
+
+    selected_ids = get_selected_guest_ids()
+    selection_version = get_bulk_selection_version()
+
     for guest in filtered:
         guest_id = guest["id"]
-        selected = guest_id == st.session_state.selected_guest_id
+        selected_for_bulk = guest_id in selected_ids
+        selected_for_single = (
+            guest_id == st.session_state.get("selected_guest_id")
+            and len(selected_ids) <= 1
+        )
+
         css_class = (
             "guest-card guest-card-selected"
-            if selected
+            if selected_for_bulk or selected_for_single
             else "guest-card"
         )
 
@@ -57,31 +136,51 @@ def _render_movement(
         eta = guest.get("transport", {}).get("eta") or "—"
 
         with st.container(border=True):
-            st.markdown(
-                '<span class="guest-card-marker"></span>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f"""
-                <div class="{css_class}">
-                    <div class="guest-name">{full_name}</div>
-                    <div class="guest-meta">
-                        Room {room} · Confirmation {confirmation}
+            checkbox_col, card_col = st.columns([0.10, 0.90], gap="small")
+
+            with checkbox_col:
+                checked = st.checkbox(
+                    "Select reservation",
+                    value=selected_for_bulk,
+                    key=(
+                        f"bulk_checkbox_{selection_version}_"
+                        f"{movement}_{guest_id}"
+                    ),
+                    label_visibility="collapsed",
+                )
+
+                if checked != selected_for_bulk:
+                    toggle_bulk_guest(guest_id, checked)
+                    _sync_single_selection()
+                    st.rerun()
+
+            with card_col:
+                st.markdown(
+                    '<span class="guest-card-marker"></span>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    f"""
+                    <div class="{css_class}">
+                        <div class="guest-name">{full_name}</div>
+                        <div class="guest-meta">
+                            Room {room} · Confirmation {confirmation}
+                        </div>
+                        <div class="guest-meta">ETA {eta}</div>
+                        {status_badge(get_status(guest))}
                     </div>
-                    <div class="guest-meta">ETA {eta}</div>
-                    {status_badge(get_status(guest))}
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+                    """,
+                    unsafe_allow_html=True,
+                )
 
             if st.button(
-                "Selected" if selected else "Select",
+                "Selected" if selected_for_single else "Open Reservation",
                 key=f"select_{movement}_{guest_id}",
-                type="primary" if selected else "secondary",
-                disabled=selected,
+                type="primary" if selected_for_single else "secondary",
+                disabled=selected_for_single,
                 use_container_width=True,
             ):
+                clear_bulk_selection()
                 st.session_state.selected_guest_id = guest_id
                 st.rerun()
 
@@ -128,11 +227,26 @@ def render_guest_list(guests: list[dict[str, Any]]) -> None:
         unsafe_allow_html=True,
     )
     st.markdown(
-        '<div class="muted">Choose an arrival or departure.</div>',
+        '<div class="muted">Open one reservation or select several for bulk communication.</div>',
         unsafe_allow_html=True,
     )
 
     search = _render_guest_search()
+    selected_count = len(get_selected_guest_ids())
+
+    if selected_count:
+        summary_col, clear_col = st.columns([0.72, 0.28], gap="small")
+        with summary_col:
+            st.info(f"{selected_count} reservation(s) selected")
+        with clear_col:
+            if st.button(
+                "Clear All",
+                key="clear_all_bulk_selection",
+                use_container_width=True,
+            ):
+                clear_bulk_selection()
+                st.session_state.selected_guest_id = None
+                st.rerun()
 
     arrivals_count = sum(
         1

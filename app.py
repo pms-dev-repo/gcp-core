@@ -79,7 +79,10 @@ else:
             st.info(
                 "No arrivals or departures were found for the selected date ranges."
             )
-        elif st.session_state.selected_guest_id is None:
+        elif (
+            st.session_state.selected_guest_id is None
+            and len(st.session_state.get("selected_guest_ids", set())) == 0
+        ):
             st.markdown(
                 """
                 <div class="empty-workspace-card">

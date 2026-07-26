@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -14,12 +15,7 @@ GENERATED_DIR = BASE_DIR / "generated"
 
 
 def _replace_tokens_in_paragraph(paragraph, replacements: dict[str, str]) -> None:
-    """Replace placeholders even when Word splits them across several runs.
-
-    The paragraph's existing run formatting is preserved as much as possible:
-    replacement text is written into the first affected run and the remaining
-    affected runs are cleared.
-    """
+    """Replace placeholders even when Word splits them across several runs."""
     if not paragraph.runs:
         return
 
@@ -31,8 +27,6 @@ def _replace_tokens_in_paragraph(paragraph, replacements: dict[str, str]) -> Non
     for token, value in replacements.items():
         updated_text = updated_text.replace(token, value)
 
-    # Put the final text in the first run so placeholders split by Word are
-    # still replaced. The first run keeps the paragraph's principal style.
     paragraph.runs[0].text = updated_text
     for run in paragraph.runs[1:]:
         run.text = ""
@@ -47,7 +41,10 @@ def _replace_tokens_in_table(table, replacements: dict[str, str]) -> None:
                 _replace_tokens_in_table(nested_table, replacements)
 
 
-def _replace_tokens_in_headers_and_footers(document, replacements: dict[str, str]) -> None:
+def _replace_tokens_in_headers_and_footers(
+    document,
+    replacements: dict[str, str],
+) -> None:
     for section in document.sections:
         for area in (section.header, section.footer):
             for paragraph in area.paragraphs:
@@ -78,8 +75,6 @@ def _resolve_template(guest: dict[str, Any]) -> tuple[Path, str]:
     template_name = configured_name or default_name
     template_path = TEMPLATES_DIR / template_name
 
-    # Demo fallback: if a configured language template is not present, use the
-    # standard English template for the same movement.
     if not template_path.exists():
         fallback_path = TEMPLATES_DIR / default_name
         if fallback_path.exists():
@@ -111,7 +106,9 @@ def generate_guest_document(guest: dict[str, Any]) -> Path:
         "{{arrival_date}}": str(stay.get("arrival_date") or "To be confirmed"),
         "{{departure_date}}": str(stay.get("departure_date") or "To be confirmed"),
         "{{eta}}": str(transport.get("eta") or "To be confirmed"),
-        "{{confirmation_number}}": str(guest.get("confirmation_number") or ""),
+        "{{confirmation_number}}": str(
+            guest.get("confirmation_number") or ""
+        ),
         "{{email}}": str(guest.get("email") or ""),
     }
 
@@ -126,7 +123,9 @@ def generate_guest_document(guest: dict[str, Any]) -> Path:
     GENERATED_DIR.mkdir(parents=True, exist_ok=True)
 
     safe_name = _safe_filename(str(guest.get("full_name") or "guest"))
-    confirmation = _safe_filename(str(guest.get("confirmation_number") or "no_confirmation"))
+    confirmation = _safe_filename(
+        str(guest.get("confirmation_number") or "no_confirmation")
+    )
     filename = f"{document_prefix}_{confirmation}_{safe_name}.docx"
 
     output_path = GENERATED_DIR / filename
@@ -142,13 +141,7 @@ def read_generated_document(path_value: str | Path) -> bytes:
 
 
 def generate_guest_pdf(docx_path_value: str | Path) -> Path:
-    """
-    Convert the edited DOCX to PDF using Microsoft Word.
-
-    This preserves the Word document layout, fonts, images, headers, footers,
-    tables, and other formatting. It is intended for local Windows execution
-    where Microsoft Word is installed.
-    """
+    """Convert a DOCX to PDF using Microsoft Word through docx2pdf."""
     try:
         from docx2pdf import convert
     except ImportError as exc:
@@ -174,23 +167,16 @@ def generate_guest_pdf(docx_path_value: str | Path) -> Path:
     except Exception as exc:
         raise OSError(
             "Microsoft Word could not convert the document to PDF. "
-            "Confirm that Word is installed and that the DOCX is not open "
-            "with unsaved changes."
+            f"Original error: {exc}"
         ) from exc
 
-    if not pdf_path.exists():
+    if not pdf_path.exists() or not pdf_path.is_file():
         raise OSError("The PDF file was not created.")
 
     return pdf_path
 
 
 def open_pdf_in_new_tab(pdf_path_value: str | Path) -> None:
-    """
-    Open a local PDF in the user's default browser.
-
-    This works when Streamlit is running locally on the same computer as the
-    browser, which is the current GCP demo setup.
-    """
     import webbrowser
 
     pdf_path = Path(pdf_path_value).resolve()
@@ -201,3 +187,152 @@ def open_pdf_in_new_tab(pdf_path_value: str | Path) -> None:
     opened = webbrowser.open_new_tab(pdf_path.as_uri())
     if not opened:
         raise OSError("The browser could not open the PDF in a new tab.")
+
+
+def generate_bulk_documents(
+    guests: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Generate one DOCX per reservation without opening Microsoft Word."""
+    results: list[dict[str, Any]] = []
+    generated = 0
+    failed = 0
+
+    for guest in guests:
+        guest_id = guest["id"]
+        full_name = guest.get("full_name") or "Unknown guest"
+
+        try:
+            output_path = generate_guest_document(guest)
+            generated += 1
+            results.append(
+                {
+                    "guest_id": guest_id,
+                    "Guest": full_name,
+                    "Status": "Generated",
+                    "Path": str(output_path),
+                    "Message": "Guest letter generated successfully",
+                }
+            )
+        except Exception as exc:
+            failed += 1
+            results.append(
+                {
+                    "guest_id": guest_id,
+                    "Guest": full_name,
+                    "Status": "Failed",
+                    "Path": "",
+                    "Message": str(exc),
+                }
+            )
+
+    return {
+        "total": len(guests),
+        "generated": generated,
+        "failed": failed,
+        "skipped": 0,
+        "results": results,
+    }
+
+
+def _convert_with_retries(
+    docx_path: str | Path,
+    attempts: int = 3,
+    delay_seconds: float = 1.25,
+) -> Path:
+    last_error: Exception | None = None
+
+    for attempt in range(1, attempts + 1):
+        try:
+            return generate_guest_pdf(docx_path)
+        except Exception as exc:
+            last_error = exc
+            if attempt < attempts:
+                time.sleep(delay_seconds * attempt)
+
+    raise OSError(
+        f"PDF conversion failed after {attempts} attempts. "
+        f"Last error: {last_error}"
+    ) from last_error
+
+
+def generate_bulk_pdfs(
+    guests: list[dict[str, Any]],
+    generated_documents: dict[str, Any],
+) -> dict[str, Any]:
+    """
+    Convert only previously generated DOCX files.
+
+    Word is not opened for editing. Conversion retries individual failures and
+    continues processing the remaining reservations.
+    """
+    results: list[dict[str, Any]] = []
+    generated = 0
+    failed = 0
+    skipped = 0
+
+    for guest in guests:
+        guest_id = guest["id"]
+        full_name = guest.get("full_name") or "Unknown guest"
+        docx_path_value = generated_documents.get(guest_id)
+
+        if not docx_path_value:
+            skipped += 1
+            results.append(
+                {
+                    "guest_id": guest_id,
+                    "Guest": full_name,
+                    "Status": "Skipped",
+                    "Path": "",
+                    "Message": "Generate the guest letter first",
+                }
+            )
+            continue
+
+        docx_path = Path(docx_path_value)
+
+        if not docx_path.exists() or not docx_path.is_file():
+            skipped += 1
+            results.append(
+                {
+                    "guest_id": guest_id,
+                    "Guest": full_name,
+                    "Status": "Skipped",
+                    "Path": "",
+                    "Message": f"DOCX file not found: {docx_path}",
+                }
+            )
+            continue
+
+        try:
+            pdf_path = _convert_with_retries(docx_path)
+            generated += 1
+            results.append(
+                {
+                    "guest_id": guest_id,
+                    "Guest": full_name,
+                    "Status": "Generated",
+                    "Path": str(pdf_path),
+                    "Message": "PDF generated successfully",
+                }
+            )
+        except Exception as exc:
+            failed += 1
+            results.append(
+                {
+                    "guest_id": guest_id,
+                    "Guest": full_name,
+                    "Status": "Failed",
+                    "Path": "",
+                    "Message": str(exc),
+                }
+            )
+
+        time.sleep(0.5)
+
+    return {
+        "total": len(guests),
+        "generated": generated,
+        "failed": failed,
+        "skipped": skipped,
+        "results": results,
+    }

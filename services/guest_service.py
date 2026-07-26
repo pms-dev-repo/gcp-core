@@ -63,6 +63,13 @@ def filter_guests_by_stay_dates(
 
 def get_guest_by_id(
     guests: list[dict[str, Any]],
-    guest_id: str,
-) -> dict[str, Any]:
-    return next(guest for guest in guests if guest["id"] == guest_id)
+    guest_id: str | None,
+) -> dict[str, Any] | None:
+    """Return the matching guest, or None when the selection is unavailable."""
+    if guest_id is None:
+        return None
+
+    return next(
+        (guest for guest in guests if guest["id"] == guest_id),
+        None,
+    )
