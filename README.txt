@@ -1,25 +1,27 @@
-GCP Individual PDF Preview v1.3
+GCP PDF Viewer v1.4
 
 Included files
 --------------
-components/workflow.py
 components/document_panel.py
+requirements.txt
 
 What changed
 ------------
-- Removed the server-side browser opening step.
-- Replaced "Open Final PDF" with "Generate & Preview PDF".
-- Stores the generated PDF in session state.
-- Displays the PDF inside the Streamlit application.
-- Adds a "Download Final PDF" button.
-- Keeps Send Email disabled until a valid PDF exists.
-- Works with the multiplatform PDF engine from v1.2.
+- Replaced the HTML/base64 iframe PDF preview.
+- Added streamlit-pdf-viewer for Streamlit Cloud compatibility.
+- Keeps the PDF download and email workflow unchanged.
+- Works with the multiplatform PDF conversion engine from v1.2.
+- Works with the individual workflow from v1.3.
 
 Install
 -------
-1. Replace components/workflow.py.
-2. Replace components/document_panel.py.
+1. Replace components/document_panel.py.
+2. Replace or merge requirements.txt.
 3. Commit and push.
-4. Reboot or rerun the Streamlit app.
+4. Reboot the Streamlit Community Cloud app.
 
-No changes are required in services/document_service.py if v1.2 is already installed.
+Important
+---------
+Keep packages.txt from v1.2 with:
+
+libreoffice

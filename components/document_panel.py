@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import base64
 from pathlib import Path
 from typing import Any
 
 import streamlit as st
+from streamlit_pdf_viewer import pdf_viewer
 
 
 def _arrival_preview(guest: dict[str, Any]) -> str:
@@ -42,43 +42,55 @@ def _departure_preview(guest: dict[str, Any]) -> str:
     """
 
 
-def _render_pdf_preview(pdf_path: Path) -> None:
+def _render_pdf_preview(pdf_path: Path, guest_id: str) -> None:
     try:
         pdf_bytes = pdf_path.read_bytes()
     except OSError as exc:
         st.error(f"Could not load the PDF preview: {exc}")
         return
 
-    encoded_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
-
     st.markdown(
-        f"""
+        """
         <div style="
             border:1px solid #d7dce5;
             border-radius:12px;
-            overflow:hidden;
-            background:#f7f8fb;
+            background:#ffffff;
+            padding:14px 16px;
             margin-top:18px;
+            margin-bottom:10px;
         ">
             <div style="
-                padding:12px 16px;
-                background:#ffffff;
-                border-bottom:1px solid #d7dce5;
                 font-weight:600;
+                font-size:16px;
+                margin-bottom:4px;
             ">
                 Final PDF Preview
             </div>
-            <iframe
-                src="data:application/pdf;base64,{encoded_pdf}"
-                width="100%"
-                height="760"
-                style="border:0;display:block;"
-                title="Final PDF Preview">
-            </iframe>
+            <div style="
+                color:#6b7280;
+                font-size:13px;
+            ">
+                Review the generated document before sending it to the guest.
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+    try:
+        pdf_viewer(
+            input=pdf_bytes,
+            width="100%",
+            height=760,
+            key=f"pdf_viewer_{guest_id}",
+        )
+    except Exception as exc:
+        st.error(f"Could not display the PDF preview: {exc}")
+        st.info(
+            "The PDF was generated successfully. "
+            "Use the Download Final PDF button to review it."
+        )
+
     st.caption(
         "Final PDF generated from the selected Word document."
     )
@@ -118,7 +130,7 @@ def render_document_panel(guest: dict[str, Any]) -> None:
     )
 
     if pdf_ready and pdf_path:
-        _render_pdf_preview(pdf_path)
+        _render_pdf_preview(pdf_path, guest_id)
         return
 
     if generated:
