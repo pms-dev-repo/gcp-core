@@ -199,98 +199,52 @@ def _render_user_details(user: dict[str, Any]) -> None:
         if part
     )[:2]
 
-    st.markdown(
-        f"""
-        <div style="
-            border:1px solid #dfe3ea;
-            border-radius:14px;
-            background:#ffffff;
-            padding:20px;
-        ">
-            <div style="
-                display:flex;
-                align-items:center;
-                gap:14px;
-                margin-bottom:18px;
-            ">
-                <div style="
-                    width:48px;
-                    height:48px;
-                    border-radius:50%;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    background:#eef1f5;
-                    color:#2f3a4a;
-                    font-weight:700;
-                    font-size:16px;
-                ">
-                    {initials}
-                </div>
-                <div>
-                    <div style="
-                        font-size:17px;
-                        font-weight:700;
-                        color:#1f2937;
-                    ">
-                        {user['name']}
-                    </div>
-                    <div style="
-                        color:#6b7280;
-                        font-size:13px;
-                    ">
-                        {user['role']}
-                    </div>
-                </div>
-            </div>
-
-            <div style="
-                font-size:14px;
-                font-weight:650;
-                color:#1f2937;
-                margin-bottom:10px;
-            ">
-                User Details
-            </div>
-
-            <div style="font-size:13px;color:#6b7280;margin-bottom:5px">
-                Email
-            </div>
-            <div style="font-size:14px;margin-bottom:13px">
-                {user['email']}
-            </div>
-
-            <div style="font-size:13px;color:#6b7280;margin-bottom:5px">
-                Role
-            </div>
-            <div style="font-size:14px;margin-bottom:13px">
-                {user['role']}
-            </div>
-
-            <div style="font-size:13px;color:#6b7280;margin-bottom:5px">
-                Status
-            </div>
-            <div style="font-size:14px;margin-bottom:13px">
-                {user['status']}
-            </div>
-
-            <div style="font-size:13px;color:#6b7280;margin-bottom:5px">
-                Language
-            </div>
-            <div style="font-size:14px;margin-bottom:13px">
-                {user['language']}
-            </div>
-
-            <div style="font-size:13px;color:#6b7280;margin-bottom:5px">
-                Last Login
-            </div>
-            <div style="font-size:14px">
-                {user['last_login']}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    user_card_html = (
+        '<div style="border:1px solid #dfe3ea;border-radius:14px;'
+        'background:#ffffff;padding:20px;">'
+        '<div style="display:flex;align-items:center;gap:14px;'
+        'margin-bottom:18px;">'
+        '<div style="width:48px;height:48px;border-radius:50%;'
+        'display:flex;align-items:center;justify-content:center;'
+        'background:#eef1f5;color:#2f3a4a;font-weight:700;'
+        f'font-size:16px;">{initials}</div>'
+        '<div>'
+        f'<div style="font-size:17px;font-weight:700;color:#1f2937;">'
+        f'{user["name"]}</div>'
+        f'<div style="color:#6b7280;font-size:13px;">'
+        f'{user["role"]}</div>'
+        '</div>'
+        '</div>'
+        '<div style="font-size:14px;font-weight:650;color:#1f2937;'
+        'margin-bottom:10px;">User Details</div>'
+        '<div style="font-size:13px;color:#6b7280;margin-bottom:5px;">'
+        'Email</div>'
+        f'<div style="font-size:14px;margin-bottom:13px;">'
+        f'{user["email"]}</div>'
+        '<div style="font-size:13px;color:#6b7280;margin-bottom:5px;">'
+        'Role</div>'
+        f'<div style="font-size:14px;margin-bottom:13px;">'
+        f'{user["role"]}</div>'
+        '<div style="font-size:13px;color:#6b7280;margin-bottom:5px;">'
+        'Status</div>'
+        '<div style="font-size:14px;margin-bottom:13px;">'
+        '<span style="display:inline-block;padding:3px 9px;'
+        'border-radius:999px;background:#e8f7ee;color:#177245;'
+        f'font-weight:600;">● {user["status"]}</span>'
+        '</div>'
+        '<div style="font-size:13px;color:#6b7280;margin-bottom:5px;">'
+        'Language</div>'
+        f'<div style="font-size:14px;margin-bottom:13px;">'
+        f'{user["language"]}</div>'
+        '<div style="font-size:13px;color:#6b7280;margin-bottom:5px;">'
+        'Last Login</div>'
+        f'<div style="font-size:14px;">{user["last_login"]}</div>'
+        '</div>'
     )
+
+    # st.html renders HTML directly and avoids Markdown treating nested,
+    # indented tags as a code block.
+    st.html(user_card_html)
 
     st.markdown("#### Permissions")
     for permission in user["permissions"]:
