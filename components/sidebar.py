@@ -120,18 +120,21 @@ def _render_guest_letters_group(
     if not items:
         return
 
+    # Explicit light color is required because the sidebar background is dark.
     st.markdown(
         """
         <div style="
-            margin-top:4px;
-            margin-bottom:3px;
-            padding:7px 10px 3px 10px;
-            color:#374151;
+            margin-top:5px;
+            margin-bottom:5px;
+            padding:8px 10px 5px 10px;
+            color:#ffffff !important;
             font-size:14px;
             font-weight:700;
+            line-height:1.25;
             letter-spacing:0.01em;
+            opacity:1;
         ">
-            ✉&nbsp;&nbsp;Guest Letters
+            <span style="color:#ffffff !important;">✉&nbsp;&nbsp;Guest Letters</span>
         </div>
         """,
         unsafe_allow_html=True,
