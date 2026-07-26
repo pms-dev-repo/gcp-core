@@ -22,7 +22,7 @@ SHOW_SEARCH = False
 
 PRIMARY_ITEMS = [
     ("▣", "Dashboard", "dashboard", SHOW_DASHBOARD),
-    ("✉", "Guest Communications", "communications", True),
+    ("✉", "Guest Mailing", "Guest Mailing", True),
     ("▤", "Templates", "templates", SHOW_TEMPLATES),
     ("◷", "Communication History", "history", SHOW_HISTORY),
 ]
