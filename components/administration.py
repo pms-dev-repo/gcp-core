@@ -8,8 +8,8 @@ import streamlit as st
 DEMO_USERS: list[dict[str, Any]] = [
     {
         "id": "demo_it_support",
-        "name": "Hugo Uzabeaga",
-        "email": "hugo.uzabeaga@lovocraft.net",
+        "name": "Carl Johnson",
+        "email": "hcarl.johnson@lcraft.net",
         "role": "IT Support",
         "status": "Active",
         "language": "English",
