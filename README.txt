@@ -1,18 +1,16 @@
-GCP Bulk Communication v1.1
+GCP PDF Multiplatform v1.2
 
-Replace these files in your project:
-- components/workspace.py
+Files:
 - services/document_service.py
-- services/email_service.py
-- utils/state.py
+- requirements.txt
+- packages.txt
 
-Bulk flow:
-1. Generate Guest Letters
-2. Generate PDFs
-3. Send Guest Letters
+Steps:
+1. Replace services/document_service.py.
+2. Replace or merge requirements.txt.
+3. Put packages.txt in the repository root.
+4. Commit and push.
+5. Reboot the Streamlit Community Cloud app.
 
-The individual workflow remains unchanged.
-
-Important:
-- PDF conversion still requires Microsoft Word and docx2pdf on Windows.
-- Bulk conversion retries each failed document up to 3 times.
+Windows uses Microsoft Word + docx2pdf.
+Linux / Streamlit Cloud uses LibreOffice headless.

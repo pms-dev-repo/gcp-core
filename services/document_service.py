@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import platform
 import re
+import shutil
+import subprocess
+import tempfile
 import time
 from datetime import datetime
 from pathlib import Path
@@ -140,16 +144,7 @@ def read_generated_document(path_value: str | Path) -> bytes:
     return path.read_bytes()
 
 
-def generate_guest_pdf(docx_path_value: str | Path) -> Path:
-    """Convert a DOCX to PDF using Microsoft Word through docx2pdf."""
-    try:
-        from docx2pdf import convert
-    except ImportError as exc:
-        raise RuntimeError(
-            "PDF generation requires docx2pdf. "
-            "Install it with: pip install docx2pdf"
-        ) from exc
-
+def _validate_docx_path(docx_path_value: str | Path) -> Path:
     docx_path = Path(docx_path_value).resolve()
 
     if not docx_path.exists() or not docx_path.is_file():
@@ -159,6 +154,19 @@ def generate_guest_pdf(docx_path_value: str | Path) -> Path:
 
     if docx_path.suffix.lower() != ".docx":
         raise ValueError("Only DOCX files can be converted to PDF.")
+
+    return docx_path
+
+
+def _convert_pdf_with_word(docx_path: Path) -> Path:
+    """Convert DOCX to PDF with Microsoft Word through docx2pdf."""
+    try:
+        from docx2pdf import convert
+    except ImportError as exc:
+        raise RuntimeError(
+            "PDF generation on Windows requires docx2pdf. "
+            "Install it with: pip install docx2pdf"
+        ) from exc
 
     pdf_path = docx_path.with_suffix(".pdf")
 
@@ -171,9 +179,93 @@ def generate_guest_pdf(docx_path_value: str | Path) -> Path:
         ) from exc
 
     if not pdf_path.exists() or not pdf_path.is_file():
-        raise OSError("The PDF file was not created.")
+        raise OSError("Microsoft Word did not create the PDF file.")
 
     return pdf_path
+
+
+def _find_libreoffice_executable() -> str:
+    for executable_name in ("libreoffice", "soffice"):
+        executable_path = shutil.which(executable_name)
+        if executable_path:
+            return executable_path
+
+    raise RuntimeError(
+        "LibreOffice is not installed or is not available in PATH. "
+        "On Streamlit Community Cloud, add 'libreoffice' to packages.txt."
+    )
+
+
+def _convert_pdf_with_libreoffice(docx_path: Path) -> Path:
+    libreoffice = _find_libreoffice_executable()
+    output_dir = docx_path.parent
+    pdf_path = docx_path.with_suffix(".pdf")
+
+    if pdf_path.exists():
+        pdf_path.unlink()
+
+    with tempfile.TemporaryDirectory(prefix="gcp_lo_profile_") as profile_dir:
+        profile_uri = Path(profile_dir).resolve().as_uri()
+
+        command = [
+            libreoffice,
+            "--headless",
+            "--nologo",
+            "--nodefault",
+            "--nolockcheck",
+            "--nofirststartwizard",
+            f"-env:UserInstallation={profile_uri}",
+            "--convert-to",
+            "pdf:writer_pdf_Export",
+            "--outdir",
+            str(output_dir),
+            str(docx_path),
+        ]
+
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=120,
+            check=False,
+        )
+
+    if result.returncode != 0:
+        details = (result.stderr or result.stdout or "Unknown LibreOffice error").strip()
+        raise OSError(
+            "LibreOffice could not convert the document to PDF. "
+            f"Exit code: {result.returncode}. Details: {details}"
+        )
+
+    if not pdf_path.exists() or not pdf_path.is_file():
+        details = (result.stdout or result.stderr or "No output returned").strip()
+        raise OSError(
+            "LibreOffice finished without creating the expected PDF file. "
+            f"Details: {details}"
+        )
+
+    return pdf_path
+
+
+def generate_guest_pdf(docx_path_value: str | Path) -> Path:
+    """
+    Windows: Microsoft Word through docx2pdf.
+    Linux / Streamlit Community Cloud: LibreOffice headless.
+    macOS: Word first, then LibreOffice fallback.
+    """
+    docx_path = _validate_docx_path(docx_path_value)
+    system_name = platform.system().lower()
+
+    if system_name == "windows":
+        return _convert_pdf_with_word(docx_path)
+
+    if system_name == "darwin":
+        try:
+            return _convert_pdf_with_word(docx_path)
+        except Exception:
+            return _convert_pdf_with_libreoffice(docx_path)
+
+    return _convert_pdf_with_libreoffice(docx_path)
 
 
 def open_pdf_in_new_tab(pdf_path_value: str | Path) -> None:
@@ -192,7 +284,6 @@ def open_pdf_in_new_tab(pdf_path_value: str | Path) -> None:
 def generate_bulk_documents(
     guests: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """Generate one DOCX per reservation without opening Microsoft Word."""
     results: list[dict[str, Any]] = []
     generated = 0
     failed = 0
@@ -259,12 +350,6 @@ def generate_bulk_pdfs(
     guests: list[dict[str, Any]],
     generated_documents: dict[str, Any],
 ) -> dict[str, Any]:
-    """
-    Convert only previously generated DOCX files.
-
-    Word is not opened for editing. Conversion retries individual failures and
-    continues processing the remaining reservations.
-    """
     results: list[dict[str, Any]] = []
     generated = 0
     failed = 0
@@ -327,7 +412,7 @@ def generate_bulk_pdfs(
                 }
             )
 
-        time.sleep(0.5)
+        time.sleep(0.25)
 
     return {
         "total": len(guests),
