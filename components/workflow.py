@@ -10,7 +10,6 @@ import streamlit as st
 from services.document_service import (
     generate_guest_document,
     generate_guest_pdf,
-    open_pdf_in_new_tab,
     read_generated_document,
 )
 from services.email_service import send_guest_email
@@ -21,6 +20,7 @@ from utils.state import add_activity
 DOCX_MIME = (
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 )
+PDF_MIME = "application/pdf"
 
 
 def _show_progress(
@@ -76,7 +76,10 @@ def _open_word_experience(
         with launcher.container(border=True):
             icon_col, title_col = st.columns([1, 7])
             with icon_col:
-                st.markdown('<div class="m365-word-logo">W</div>', unsafe_allow_html=True)
+                st.markdown(
+                    '<div class="m365-word-logo">W</div>',
+                    unsafe_allow_html=True,
+                )
             with title_col:
                 st.markdown("**Microsoft 365**")
                 st.caption("Microsoft Word")
@@ -97,7 +100,10 @@ def _open_word_experience(
     with launcher.container(border=True):
         icon_col, title_col = st.columns([1, 7])
         with icon_col:
-            st.markdown('<div class="m365-word-logo">W</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="m365-word-logo">W</div>',
+                unsafe_allow_html=True,
+            )
         with title_col:
             st.markdown("**Microsoft Word**")
             st.caption("Editing session")
@@ -105,7 +111,9 @@ def _open_word_experience(
         st.success("Document opened successfully.", icon="✅")
         st.progress(100, text="100%")
         st.markdown(f"**Document:** `{generated_path.name}`")
-        st.caption("Edit the document and save it before generating the final PDF.")
+        st.caption(
+            "Edit the document and save it before generating the final PDF."
+        )
 
     time.sleep(0.9)
     launcher.empty()
@@ -144,10 +152,19 @@ def render_workflow(guest: dict[str, Any]) -> None:
     sent = st.session_state.email_sent.get(guest_id, False)
 
     with st.container(border=True):
-        st.markdown('<span class="workflow-card-marker"></span>', unsafe_allow_html=True)
-        st.markdown('<div class="panel-title workflow-title">Workflow</div>', unsafe_allow_html=True)
+        st.markdown(
+            '<span class="workflow-card-marker"></span>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="panel-title workflow-title">Workflow</div>',
+            unsafe_allow_html=True,
+        )
 
-        button_left, button_center, button_right = st.columns([1, 1.35, 1], gap="small")
+        button_left, button_center, button_right = st.columns(
+            [1, 1.35, 1],
+            gap="small",
+        )
 
         with button_center:
             if st.button(
@@ -170,7 +187,9 @@ def render_workflow(guest: dict[str, Any]) -> None:
                         action=lambda: generate_guest_document(guest),
                     )
 
-                    st.session_state.generated_documents[guest_id] = str(output_path)
+                    st.session_state.generated_documents[guest_id] = str(
+                        output_path
+                    )
                     st.session_state.document_status[guest_id] = True
                     st.session_state.word_opened[guest_id] = False
                     st.session_state.pdf_generated[guest_id] = False
@@ -191,7 +210,13 @@ def render_workflow(guest: dict[str, Any]) -> None:
                     st.toast("Document ready.", icon="✅")
                     st.rerun()
 
-                except (FileNotFoundError, ValueError, KeyError, OSError, RuntimeError) as exc:
+                except (
+                    FileNotFoundError,
+                    ValueError,
+                    KeyError,
+                    OSError,
+                    RuntimeError,
+                ) as exc:
                     st.error(f"Could not generate the document: {exc}")
 
             try:
@@ -206,43 +231,84 @@ def render_workflow(guest: dict[str, Any]) -> None:
 
             desktop_word_available = can_open_desktop_word()
 
-            st.markdown('<span class="word-action-marker"></span>', unsafe_allow_html=True)
+            st.markdown(
+                '<span class="word-action-marker"></span>',
+                unsafe_allow_html=True,
+            )
 
             if desktop_word_available:
                 if st.button(
-                    "Edit in Microsoft Word" if not reviewed else "Edited in Microsoft Word",
+                    (
+                        "Edit in Microsoft Word"
+                        if not reviewed
+                        else "Edited in Microsoft Word"
+                    ),
                     disabled=not generated,
                     key=f"word_{guest_id}",
                     use_container_width=True,
                 ):
                     try:
                         if generated_path is None:
-                            raise FileNotFoundError("Generate the document first.")
+                            raise FileNotFoundError(
+                                "Generate the document first."
+                            )
 
-                        word_url = _open_word_experience(guest, generated_path)
-                        opened_at = datetime.now().strftime("%I:%M %p").lstrip("0")
+                        word_url = _open_word_experience(
+                            guest,
+                            generated_path,
+                        )
+                        opened_at = datetime.now().strftime(
+                            "%I:%M %p"
+                        ).lstrip("0")
 
                         st.session_state.word_opened[guest_id] = True
-                        st.session_state.setdefault("word_opened_at", {})[guest_id] = opened_at
-                        st.session_state.setdefault("word_urls", {})[guest_id] = word_url
+                        st.session_state.setdefault(
+                            "word_opened_at",
+                            {},
+                        )[guest_id] = opened_at
+                        st.session_state.setdefault(
+                            "word_urls",
+                            {},
+                        )[guest_id] = word_url
                         st.session_state.pdf_generated[guest_id] = False
                         st.session_state.generated_pdfs.pop(guest_id, None)
 
                         add_activity(
                             guest_id,
-                            f"Document opened for editing in Microsoft Word at {opened_at}",
+                            (
+                                "Document opened for editing in "
+                                f"Microsoft Word at {opened_at}"
+                            ),
                         )
 
-                        st.toast("Document opened in Microsoft Word.", icon="✅")
+                        st.toast(
+                            "Document opened in Microsoft Word.",
+                            icon="✅",
+                        )
                         st.rerun()
 
-                    except (FileNotFoundError, ValueError, KeyError, OSError) as exc:
-                        st.error(f"Could not open the document in Word: {exc}")
+                    except (
+                        FileNotFoundError,
+                        ValueError,
+                        KeyError,
+                        OSError,
+                    ) as exc:
+                        st.error(
+                            f"Could not open the document in Word: {exc}"
+                        )
             else:
                 st.download_button(
-                    "Edit in Microsoft Word" if not reviewed else "Edited in Microsoft Word",
+                    (
+                        "Edit in Microsoft Word"
+                        if not reviewed
+                        else "Edited in Microsoft Word"
+                    ),
                     data=docx_bytes,
-                    file_name=generated_path.name if generated_path else "guest_letter.docx",
+                    file_name=(
+                        generated_path.name
+                        if generated_path
+                        else "guest_letter.docx"
+                    ),
                     mime=DOCX_MIME,
                     disabled=not generated,
                     key=f"word_download_{guest_id}",
@@ -252,35 +318,45 @@ def render_workflow(guest: dict[str, Any]) -> None:
                 )
                 if generated:
                     st.caption(
-                        "Download the editable DOCX, open it in Microsoft Word, "
-                        "save your changes, and then generate the final PDF."
+                        "Download the editable DOCX, open it in Microsoft "
+                        "Word, save your changes, and then generate the "
+                        "final PDF."
                     )
 
             if reviewed:
-                opened_at = st.session_state.get("word_opened_at", {}).get(guest_id)
+                opened_at = st.session_state.get(
+                    "word_opened_at",
+                    {},
+                ).get(guest_id)
                 if opened_at:
                     st.markdown(
                         f'<div class="word-opened-meta">'
                         f'<span>✓</span> Last opened today at {opened_at}'
-                        f'</div>',
+                        f"</div>",
                         unsafe_allow_html=True,
                     )
 
             if st.button(
-                "📄 Open Final PDF",
+                (
+                    "📄 Generate & Preview PDF"
+                    if not pdf_ready
+                    else "📄 Regenerate PDF"
+                ),
                 disabled=not (generated and reviewed),
-                key=f"open_pdf_{guest_id}",
+                key=f"generate_pdf_{guest_id}",
                 use_container_width=True,
             ):
                 try:
                     if generated_path is None:
-                        raise FileNotFoundError("Generate the document first.")
+                        raise FileNotFoundError(
+                            "Generate the document first."
+                        )
 
                     steps = [
                         ("Reading the edited Word document...", 25, 0.25),
-                        ("Converting with Microsoft Word...", 65, 0.35),
+                        ("Converting document to PDF...", 65, 0.35),
                         ("Preparing PDF preview...", 92, 0.25),
-                        ("Opening PDF...", 98, 0.15),
+                        ("Finalizing PDF...", 98, 0.15),
                     ]
 
                     final_pdf, status_placeholder, progress_bar = _show_progress(
@@ -290,10 +366,11 @@ def render_workflow(guest: dict[str, Any]) -> None:
 
                     st.session_state.generated_pdfs[guest_id] = str(final_pdf)
                     st.session_state.pdf_generated[guest_id] = True
+                    st.session_state.email_sent[guest_id] = False
 
                     add_activity(
                         guest_id,
-                        f"Final PDF generated and opened: {final_pdf.name}",
+                        f"Final PDF generated: {final_pdf.name}",
                     )
 
                     _finish_progress(
@@ -302,12 +379,39 @@ def render_workflow(guest: dict[str, Any]) -> None:
                         "Final PDF generated successfully.",
                     )
 
-                    open_pdf_in_new_tab(final_pdf)
-                    st.toast("Final PDF opened in a new browser tab.", icon="📄")
+                    st.toast(
+                        "Final PDF ready for preview.",
+                        icon="📄",
+                    )
                     st.rerun()
 
-                except (FileNotFoundError, ValueError, OSError, RuntimeError) as exc:
-                    st.error(f"Could not generate or open the final PDF: {exc}")
+                except (
+                    FileNotFoundError,
+                    ValueError,
+                    OSError,
+                    RuntimeError,
+                ) as exc:
+                    st.error(
+                        f"Could not generate the final PDF: {exc}"
+                    )
+
+            if pdf_ready and pdf_path:
+                try:
+                    pdf_bytes = pdf_path.read_bytes()
+                    st.success("Final PDF generated successfully.", icon="✅")
+                    st.caption(
+                        "The PDF preview is displayed in the document panel."
+                    )
+                    st.download_button(
+                        "⬇ Download Final PDF",
+                        data=pdf_bytes,
+                        file_name=pdf_path.name,
+                        mime=PDF_MIME,
+                        key=f"download_pdf_{guest_id}",
+                        use_container_width=True,
+                    )
+                except OSError as exc:
+                    st.error(f"Could not read the final PDF: {exc}")
 
             if st.button(
                 "📧 Send Email",
@@ -346,7 +450,9 @@ def render_workflow(guest: dict[str, Any]) -> None:
                     else:
                         progress_bar.empty()
                         status_placeholder.empty()
-                        st.error("The email service could not send the message.")
+                        st.error(
+                            "The email service could not send the message."
+                        )
 
                 except (ValueError, KeyError, OSError) as exc:
                     st.error(f"Could not send the email: {exc}")
@@ -354,7 +460,9 @@ def render_workflow(guest: dict[str, Any]) -> None:
         st.markdown("---")
 
         st.markdown(
-            '<div class="workflow-status-title">Communication Status</div>',
+            '<div class="workflow-status-title">'
+            "Communication Status"
+            "</div>",
             unsafe_allow_html=True,
         )
 

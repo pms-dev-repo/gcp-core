@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 from typing import Any
 
@@ -41,10 +42,65 @@ def _departure_preview(guest: dict[str, Any]) -> str:
     """
 
 
+def _render_pdf_preview(pdf_path: Path) -> None:
+    try:
+        pdf_bytes = pdf_path.read_bytes()
+    except OSError as exc:
+        st.error(f"Could not load the PDF preview: {exc}")
+        return
+
+    encoded_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+
+    st.markdown(
+        f"""
+        <div style="
+            border:1px solid #d7dce5;
+            border-radius:12px;
+            overflow:hidden;
+            background:#f7f8fb;
+            margin-top:18px;
+        ">
+            <div style="
+                padding:12px 16px;
+                background:#ffffff;
+                border-bottom:1px solid #d7dce5;
+                font-weight:600;
+            ">
+                Final PDF Preview
+            </div>
+            <iframe
+                src="data:application/pdf;base64,{encoded_pdf}"
+                width="100%"
+                height="760"
+                style="border:0;display:block;"
+                title="Final PDF Preview">
+            </iframe>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        "Final PDF generated from the selected Word document."
+    )
+
+
 def render_document_panel(guest: dict[str, Any]) -> None:
-    generated_path_value = st.session_state.generated_documents.get(guest["id"])
-    generated_path = Path(generated_path_value) if generated_path_value else None
+    guest_id = guest["id"]
+
+    generated_path_value = st.session_state.generated_documents.get(guest_id)
+    generated_path = (
+        Path(generated_path_value)
+        if generated_path_value
+        else None
+    )
     generated = bool(generated_path and generated_path.exists())
+
+    pdf_path_value = st.session_state.get(
+        "generated_pdfs",
+        {},
+    ).get(guest_id)
+    pdf_path = Path(pdf_path_value) if pdf_path_value else None
+    pdf_ready = bool(pdf_path and pdf_path.exists())
 
     st.markdown(
         f"""
@@ -60,6 +116,10 @@ def render_document_panel(guest: dict[str, Any]) -> None:
         """,
         unsafe_allow_html=True,
     )
+
+    if pdf_ready and pdf_path:
+        _render_pdf_preview(pdf_path)
+        return
 
     if generated:
         movement = str(guest.get("movement", "")).lower()
@@ -77,12 +137,17 @@ def render_document_panel(guest: dict[str, Any]) -> None:
             unsafe_allow_html=True,
         )
         st.caption(
-            "Demo preview. The Download DOCX button uses the real Word document generated from the selected template."
+            "Demo preview. The Download DOCX button uses the real Word "
+            "document generated from the selected template."
         )
     else:
         st.markdown(
             """
-            <div class="preview-box" style="display:flex;align-items:center;justify-content:center">
+            <div class="preview-box" style="
+                display:flex;
+                align-items:center;
+                justify-content:center;
+            ">
               <div style="text-align:center;color:#6b7280">
                 <div style="font-size:32px;margin-bottom:8px">📄</div>
                 No document generated yet.
