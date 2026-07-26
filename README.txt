@@ -1,20 +1,31 @@
-GCP Bulk PDF Download v1.5
+GCP Administration Demo v1.6
 
-Included
---------
-components/workspace.py
+Included files
+--------------
+app.py
+components/administration.py
+components/sidebar.py
+utils/state.py
 
-Changes
--------
-- Adds a Download PDF button for each guest with a generated PDF.
-- Adds Download All PDFs to create one ZIP containing every available PDF.
-- Keeps document generation, PDF generation, email sending, and clear selection unchanged.
-- Guests without a generated PDF show a disabled Not Ready button.
+What this version adds
+----------------------
+- Administration item remains visible under MANAGEMENT.
+- Real Administration demo page instead of the generic placeholder.
+- Three demo roles:
+  - IT Support
+  - Front Desk
+  - General Manager
+- User metrics, user list, user detail panel and visual permissions.
+- New User, Edit User, Reset Password, Deactivate and Delete actions.
+- All actions are demo-only and do not create, update or delete real users.
 
 Installation
 ------------
-1. Replace components/workspace.py.
-2. Commit and push the change.
-3. Reboot the Streamlit app if needed.
+1. Replace app.py.
+2. Add components/administration.py.
+3. Replace components/sidebar.py and utils/state.py only if your current
+   copies still match the files originally supplied for this version.
+4. Commit and push.
+5. Reboot the Streamlit app if required.
 
-No new Python package is required.
+No new dependencies are required.

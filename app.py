@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from components.administration import render_administration
 from components.guest_list import render_guest_list
 from components.header import render_header
 from components.sidebar import render_sidebar
@@ -33,12 +34,13 @@ with st.sidebar:
 
 active_page = st.session_state.get("active_page", "communications")
 
-if active_page != "communications":
+if active_page == "administration":
+    render_administration()
+elif active_page != "communications":
     page_titles = {
         "dashboard": "Dashboard",
         "templates": "Templates",
         "history": "Communication History",
-        "administration": "Administration",
         "settings": "Settings",
         "help": "Help",
         "about": "About GCP",
