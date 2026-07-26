@@ -120,21 +120,38 @@ def _render_guest_letters_group(
     if not items:
         return
 
-    # Explicit light color is required because the sidebar background is dark.
+    # Some global themes use -webkit-text-fill-color, which can override
+    # normal `color`. Set both properties on the parent and every child.
     st.markdown(
         """
-        <div style="
+        <style>
+        section[data-testid="stSidebar"] .gcp-guest-letters-parent,
+        section[data-testid="stSidebar"] .gcp-guest-letters-parent *,
+        [data-testid="stSidebar"] .gcp-guest-letters-parent,
+        [data-testid="stSidebar"] .gcp-guest-letters-parent * {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            opacity: 1 !important;
+        }
+        </style>
+
+        <div class="gcp-guest-letters-parent" style="
             margin-top:5px;
             margin-bottom:5px;
             padding:8px 10px 5px 10px;
             color:#ffffff !important;
+            -webkit-text-fill-color:#ffffff !important;
             font-size:14px;
             font-weight:700;
             line-height:1.25;
             letter-spacing:0.01em;
-            opacity:1;
+            opacity:1 !important;
         ">
-            <span style="color:#ffffff !important;">✉&nbsp;&nbsp;Guest Letters</span>
+            <span style="
+                color:#ffffff !important;
+                -webkit-text-fill-color:#ffffff !important;
+                opacity:1 !important;
+            ">✉&nbsp;&nbsp;Guest Letters</span>
         </div>
         """,
         unsafe_allow_html=True,

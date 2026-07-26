@@ -1,10 +1,11 @@
-GCP Sidebar Submenu v1.11
+GCP Sidebar Submenu v1.12
 
 Fix:
-- Guest Letters parent label now uses explicit white text.
-- Added !important to prevent the global stylesheet from applying dark text
-  inside the dark Streamlit sidebar.
-- All True/False module flags remain unchanged.
+- Forces Guest Letters to white using both:
+  color: #ffffff
+  -webkit-text-fill-color: #ffffff
+- Adds selectors scoped to Streamlit's sidebar.
+- Keeps all module visibility flags.
 
 Replace:
 components/sidebar.py
