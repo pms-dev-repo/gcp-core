@@ -23,6 +23,8 @@ DEMO_USERS: list[dict[str, Any]] = [
             "Administration",
             "Manage Users",
             "Technical Settings",
+            "Use Templates",
+            "Manage Templates",
         ],
     },
     {
@@ -39,6 +41,7 @@ DEMO_USERS: list[dict[str, Any]] = [
             "Generate PDFs",
             "Send Emails",
             "Communication History",
+            "Use Templates",
         ],
     },
     {
@@ -58,6 +61,8 @@ DEMO_USERS: list[dict[str, Any]] = [
             "Communication History",
             "Administration",
             "Reports",
+            "Use Templates",
+            "Manage Templates",
         ],
     },
 ]

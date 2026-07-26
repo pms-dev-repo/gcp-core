@@ -7,6 +7,7 @@ from components.guest_list import render_guest_list
 from components.header import render_header
 from components.sidebar import render_sidebar
 from components.stay_filter import render_stay_filter
+from components.template_management import render_template_studio
 from components.workspace import render_workspace
 from services.guest_service import filter_guests_by_stay_dates, load_guests
 from utils.state import ensure_selected_guest, initialize_state
@@ -36,10 +37,11 @@ active_page = st.session_state.get("active_page", "communications")
 
 if active_page == "administration":
     render_administration()
+elif active_page == "templates":
+    render_template_studio()
 elif active_page != "communications":
     page_titles = {
         "dashboard": "Dashboard",
-        "templates": "Templates",
         "history": "Communication History",
         "settings": "Settings",
         "help": "Help",

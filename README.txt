@@ -1,14 +1,36 @@
-GCP Administration Fix v1.8
+GCP Template Studio v1.9
 
-This version replaces st.markdown(..., unsafe_allow_html=True) with st.html()
-for the user detail card. It also builds the HTML without blank lines, which
-prevents Streamlit's Markdown parser from displaying nested DIV tags as code.
-
-Replace:
+Included files
+--------------
+app.py
+components/sidebar.py
 components/administration.py
+components/template_management.py
 
-Then fully stop and restart Streamlit:
-Ctrl+C
+What this version adds
+----------------------
+- New Template Studio item under MANAGEMENT.
+- Template metrics and searchable template list.
+- Demo templates for:
+  - Arrival
+  - Departure
+  - Birthday
+  - Anniversary
+  - VIP
+  - Special Events
+- Template details, available variables and document preview.
+- Demo actions: New, Edit, Duplicate, Activate/Deactivate and Archive.
+- New role permissions:
+  - Use Templates
+  - Manage Templates
+- IT Support and General Manager can manage templates.
+- Front Desk can use templates.
+
+Installation
+------------
+Replace the included files in the matching project paths.
+
+Then restart Streamlit:
 streamlit run app.py
 
-Requires Streamlit 1.50 or newer.
+No new dependencies are required.

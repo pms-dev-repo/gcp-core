@@ -9,7 +9,7 @@ import streamlit as st
 # ==========================================================
 
 SHOW_DASHBOARD = False
-SHOW_TEMPLATES = False
+SHOW_TEMPLATES = True
 SHOW_HISTORY = False
 SHOW_ADMINISTRATION = True
 SHOW_SETTINGS = False
@@ -23,12 +23,12 @@ SHOW_SEARCH = False
 PRIMARY_ITEMS = [
     ("▣", "Dashboard", "dashboard", SHOW_DASHBOARD),
     ("✉", "Guest Mailing", "communications", True),
-    ("▤", "Templates", "templates", SHOW_TEMPLATES),
     ("◷", "Communication History", "history", SHOW_HISTORY),
 ]
 
 ADMIN_ITEMS = [
     ("⚙", "Administration", "administration", SHOW_ADMINISTRATION),
+    ("▤", "Template Studio", "templates", SHOW_TEMPLATES),
     ("◉", "Settings", "settings", SHOW_SETTINGS),
 ]
 
