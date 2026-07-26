@@ -1,27 +1,20 @@
-GCP PDF Viewer v1.4
+GCP Bulk PDF Download v1.5
 
-Included files
---------------
-components/document_panel.py
-requirements.txt
+Included
+--------
+components/workspace.py
 
-What changed
-------------
-- Replaced the HTML/base64 iframe PDF preview.
-- Added streamlit-pdf-viewer for Streamlit Cloud compatibility.
-- Keeps the PDF download and email workflow unchanged.
-- Works with the multiplatform PDF conversion engine from v1.2.
-- Works with the individual workflow from v1.3.
-
-Install
+Changes
 -------
-1. Replace components/document_panel.py.
-2. Replace or merge requirements.txt.
-3. Commit and push.
-4. Reboot the Streamlit Community Cloud app.
+- Adds a Download PDF button for each guest with a generated PDF.
+- Adds Download All PDFs to create one ZIP containing every available PDF.
+- Keeps document generation, PDF generation, email sending, and clear selection unchanged.
+- Guests without a generated PDF show a disabled Not Ready button.
 
-Important
----------
-Keep packages.txt from v1.2 with:
+Installation
+------------
+1. Replace components/workspace.py.
+2. Commit and push the change.
+3. Reboot the Streamlit app if needed.
 
-libreoffice
+No new Python package is required.

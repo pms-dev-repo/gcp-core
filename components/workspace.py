@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 from typing import Any
+import zipfile
 
 import streamlit as st
 
@@ -36,12 +39,67 @@ def _path_exists(path_value: Any) -> bool:
         return False
 
 
-def _render_bulk_table(selected_guests: list[dict[str, Any]]) -> None:
-    rows: list[dict[str, str]] = []
+def _build_bulk_pdf_zip(
+    selected_guests: list[dict[str, Any]],
+) -> tuple[bytes | None, int]:
+    buffer = BytesIO()
+    added = 0
 
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for guest in selected_guests:
+            guest_id = guest["id"]
+            pdf_value = st.session_state.generated_pdfs.get(guest_id)
+
+            if not _path_exists(pdf_value):
+                continue
+
+            pdf_path = Path(pdf_value)
+            guest_name = (
+                guest.get("full_name")
+                or guest.get("confirmation_number")
+                or str(guest_id)
+            )
+            safe_name = "".join(
+                char if char.isalnum() or char in {" ", "-", "_"} else "_"
+                for char in str(guest_name)
+            ).strip().replace(" ", "_")
+
+            confirmation = guest.get("confirmation_number") or guest_id
+            archive_name = (
+                f"{safe_name}_{confirmation}.pdf"
+                if safe_name
+                else f"{confirmation}.pdf"
+            )
+
+            archive.writestr(archive_name, pdf_path.read_bytes())
+            added += 1
+
+    if added == 0:
+        return None, 0
+
+    buffer.seek(0)
+    return buffer.getvalue(), added
+
+
+def _render_bulk_table(selected_guests: list[dict[str, Any]]) -> None:
     generated_documents = st.session_state.generated_documents
     generated_pdfs = st.session_state.generated_pdfs
     email_sent = st.session_state.email_sent
+
+    header_cols = st.columns([2.2, 1.2, 0.8, 1, 1, 1.2, 1.25], gap="small")
+    headers = [
+        "Guest",
+        "Confirmation",
+        "Room",
+        "Letter",
+        "PDF",
+        "Status",
+        "Download",
+    ]
+    for column, label in zip(header_cols, headers):
+        column.markdown(f"**{label}**")
+
+    st.divider()
 
     for guest in selected_guests:
         guest_id = guest["id"]
@@ -61,27 +119,41 @@ def _render_bulk_table(selected_guests: list[dict[str, Any]]) -> None:
         else:
             status = "Ready to send"
 
-        rows.append(
-            {
-                "Guest": guest.get("full_name") or "Unknown guest",
-                "Confirmation": guest.get("confirmation_number") or "—",
-                "Room": guest.get("room") or "—",
-                "Letter": "Available" if has_docx else "Pending",
-                "PDF": "Generated" if has_pdf else "Pending",
-                "Email": (
-                    "Sent"
-                    if was_sent
-                    else "Ready"
-                    if has_docx and has_pdf and has_email
-                    else "Missing"
-                    if not has_email
-                    else "Waiting"
-                ),
-                "Status": status,
-            }
-        )
+        row_cols = st.columns([2.2, 1.2, 0.8, 1, 1, 1.2, 1.25], gap="small")
+        row_cols[0].write(guest.get("full_name") or "Unknown guest")
+        row_cols[1].write(guest.get("confirmation_number") or "—")
+        row_cols[2].write(guest.get("room") or "—")
+        row_cols[3].write("Available" if has_docx else "Pending")
+        row_cols[4].write("Generated" if has_pdf else "Pending")
+        row_cols[5].write(status)
 
-    st.dataframe(rows, use_container_width=True, hide_index=True)
+        if has_pdf:
+            pdf_path = Path(generated_pdfs[guest_id])
+            try:
+                pdf_bytes = pdf_path.read_bytes()
+            except OSError as exc:
+                row_cols[6].caption(f"Unavailable: {exc}")
+            else:
+                row_cols[6].download_button(
+                    "Download PDF",
+                    data=pdf_bytes,
+                    file_name=pdf_path.name,
+                    mime="application/pdf",
+                    key=f"bulk_download_pdf_{guest_id}",
+                    use_container_width=True,
+                )
+        else:
+            row_cols[6].button(
+                "Not Ready",
+                key=f"bulk_pdf_not_ready_{guest_id}",
+                disabled=True,
+                use_container_width=True,
+            )
+
+        st.markdown(
+            "<hr style='margin:0.35rem 0;border:none;border-top:1px solid #eceff3;'>",
+            unsafe_allow_html=True,
+        )
 
 
 def _render_operation_result(
@@ -223,8 +295,13 @@ def _render_bulk_workspace(
     st.markdown("#### Review Selection")
     _render_bulk_table(selected_guests)
 
-    docx_col, pdf_col, send_col, clear_col = st.columns(
-        [1, 1, 1, 0.75],
+    zip_bytes, zip_count = _build_bulk_pdf_zip(selected_guests)
+    zip_filename = (
+        f"Guest_Letters_{datetime.now().strftime('%Y-%m-%d_%H-%M')}.zip"
+    )
+
+    docx_col, pdf_col, download_col, send_col, clear_col = st.columns(
+        [1, 1, 1, 1, 0.75],
         gap="small",
     )
 
@@ -241,6 +318,17 @@ def _render_bulk_workspace(
             key="bulk_generate_pdfs",
             use_container_width=True,
             disabled=len(docx_ready_guests) == 0,
+        )
+
+    with download_col:
+        st.download_button(
+            f"Download All PDFs ({zip_count})",
+            data=zip_bytes or b"",
+            file_name=zip_filename,
+            mime="application/zip",
+            key="bulk_download_all_pdfs",
+            use_container_width=True,
+            disabled=zip_bytes is None,
         )
 
     with send_col:
