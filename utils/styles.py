@@ -1280,6 +1280,118 @@ div[data-testid="stDateInput"] input{
 }
 
 
+/* ==========================================================
+   GCP UI POLISH v2.0
+   Compact top alignment for header, sidebar and workspace.
+========================================================== */
+
+/* Remove Streamlit's residual top spacing from the main canvas. */
+[data-testid="stMainBlockContainer"],
+.block-container{
+    padding-top:0 !important;
+    margin-top:0 !important;
+}
+
+.block-container{
+    padding-left:16px !important;
+    padding-right:16px !important;
+    padding-bottom:1.5rem !important;
+}
+
+/* The toggle button is absolutely positioned, but its Streamlit wrapper
+   otherwise remains in document flow and creates the large blank band. */
+div[data-testid="stElementContainer"]:has(
+    button[title="Show or hide navigation"]
+),
+div[data-testid="stElementContainer"]:has(
+    button[aria-label="Show or hide navigation"]
+){
+    position:absolute !important;
+    inset:0 auto auto 0 !important;
+    width:0 !important;
+    height:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    z-index:1003 !important;
+}
+
+/* Align the toggle exactly with the header bar. */
+div[data-testid="stButton"] button[title="Show or hide navigation"],
+div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
+    top:0 !important;
+    left:16px !important;
+    width:50px !important;
+    min-width:50px !important;
+    height:46px !important;
+    min-height:46px !important;
+}
+
+/* Compact enterprise header. */
+.gcp-header{
+    height:46px !important;
+    min-height:46px !important;
+    margin:0 0 10px !important;
+    padding-left:66px !important;
+    border-radius:0 !important;
+}
+
+.gcp-brand{
+    font-size:27px !important;
+}
+
+/* Start native sidebar content at the same top edge as the header. */
+[data-testid="stSidebar"] > div:first-child{
+    padding-top:0 !important;
+}
+
+[data-testid="stSidebarContent"]{
+    padding-top:0 !important;
+}
+
+/* Remove the small synthetic spacer used when branding/search are hidden. */
+[data-testid="stSidebar"] .gcp-sidebar-root + div:has(> div[style*="height:10px"]),
+[data-testid="stSidebar"] div[style*="height:10px"]{
+    height:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+}
+
+/* Keep the first section visually aligned and compact. */
+.gcp-sidebar-section-label{
+    padding-top:8px !important;
+}
+
+/* Reduce unnecessary vertical gaps immediately below the header. */
+.gcp-header + div,
+.gcp-header + [data-testid="stElementContainer"]{
+    margin-top:0 !important;
+}
+
+.stay-filter-heading{
+    margin-top:0 !important;
+}
+
+@media (max-width:900px){
+    .block-container{
+        padding-left:10px !important;
+        padding-right:10px !important;
+    }
+
+    div[data-testid="stButton"] button[title="Show or hide navigation"],
+    div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
+        left:10px !important;
+    }
+
+    .gcp-header{
+        padding-left:62px !important;
+        margin-bottom:8px !important;
+    }
+}
+
+
         </style>
         """,
         unsafe_allow_html=True,
