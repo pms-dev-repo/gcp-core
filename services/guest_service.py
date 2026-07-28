@@ -88,3 +88,21 @@ def get_guest_by_id(
         return None
 
     return next((guest for guest in guests if guest["id"] == guest_id), None)
+
+
+def filter_confirmations_by_arrival_date(guests: list[dict[str, Any]], selected_date: date) -> list[dict[str, Any]]:
+    return [g for g in guests if str(g.get("reservation_status", "RESERVED")).upper() != "CANCELLED" and _parse_guest_date(g.get("stay", {}).get("arrival_date")) == selected_date]
+
+
+def filter_cancellations_by_date(guests: list[dict[str, Any]], selected_date: date) -> list[dict[str, Any]]:
+    return [g for g in guests if str(g.get("reservation_status", "")).upper() == "CANCELLED" and _parse_guest_date(g.get("cancellation_date")) == selected_date]
+
+
+def get_available_confirmation_dates(guests: list[dict[str, Any]]) -> list[date]:
+    values = {_parse_guest_date(g.get("stay", {}).get("arrival_date")) for g in guests if str(g.get("reservation_status", "RESERVED")).upper() != "CANCELLED"}
+    return sorted(value for value in values if value is not None)
+
+
+def get_available_cancellation_dates(guests: list[dict[str, Any]]) -> list[date]:
+    values = {_parse_guest_date(g.get("cancellation_date")) for g in guests if str(g.get("reservation_status", "")).upper() == "CANCELLED"}
+    return sorted(value for value in values if value is not None)

@@ -76,16 +76,27 @@ def _safe_filename(value: str) -> str:
     return cleaned.strip("_") or "guest"
 
 
-def _resolve_template(guest: dict[str, Any]) -> tuple[Path, str]:
+def _resolve_template(guest: dict[str, Any], document_kind: str | None = None) -> tuple[Path, str]:
     movement = str(guest.get("movement", "")).strip().lower()
     template = guest.get("template", {})
     configured_name = str(template.get("file_name", "")).strip()
 
-    if movement == "arrivals":
+    kind = (document_kind or "").strip().lower()
+    if kind == "confirmation":
+        default_name = "confirmation_standard_en.docx"
+        fallback_name = "arrival_standard_en.docx"
+        default_prefix = "CONFIRMATION"
+    elif kind == "cancellation":
+        default_name = "cancellation_standard_en.docx"
+        fallback_name = "departure_standard_en.docx"
+        default_prefix = "CANCELLATION"
+    elif movement == "arrivals":
         default_name = "arrival_standard_en.docx"
+        fallback_name = default_name
         default_prefix = "ARRIVAL"
     elif movement == "departures":
         default_name = "departure_standard_en.docx"
+        fallback_name = default_name
         default_prefix = "DEPARTURE"
     else:
         raise ValueError(f"Unsupported movement: {guest.get('movement')}")
@@ -95,7 +106,7 @@ def _resolve_template(guest: dict[str, Any]) -> tuple[Path, str]:
     template_path = templates_dir / template_name
 
     if not template_path.exists():
-        fallback_path = templates_dir / default_name
+        fallback_path = templates_dir / fallback_name
         if fallback_path.exists():
             template_path = fallback_path
         else:
@@ -108,8 +119,8 @@ def _resolve_template(guest: dict[str, Any]) -> tuple[Path, str]:
     return template_path, prefix
 
 
-def generate_guest_document(guest: dict[str, Any]) -> Path:
-    template_path, document_prefix = _resolve_template(guest)
+def generate_guest_document(guest: dict[str, Any], document_kind: str | None = None) -> Path:
+    template_path, document_prefix = _resolve_template(guest, document_kind=document_kind)
 
     stay = guest.get("stay", {})
     transport = guest.get("transport", {})
@@ -129,6 +140,8 @@ def generate_guest_document(guest: dict[str, Any]) -> Path:
             guest.get("confirmation_number") or ""
         ),
         "{{email}}": str(guest.get("email") or ""),
+        "{{cancellation_date}}": str(guest.get("cancellation_date") or ""),
+        "{{cancellation_reason}}": str(guest.get("cancellation_reason") or ""),
     }
 
     document = Document(template_path)
