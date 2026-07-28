@@ -102,19 +102,3 @@ else:
         titles.get(active_page, "GCP"),
         "This module is enabled and ready for its implementation phase.",
     )
-try:
-    supabase = get_supabase()
-
-    result = (
-        supabase
-        .table("registration_cards")
-        .select("id")
-        .limit(1)
-        .execute()
-    )
-
-    st.success("✅ Connected to Supabase")
-    st.write(result.data)
-
-except Exception as e:
-    st.error(e)
