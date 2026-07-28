@@ -1,0 +1,5 @@
+# After st.set_page_config(...)
+
+client_from_url = st.query_params.get("client")
+if client_from_url:
+    st.session_state["active_client_code"] = str(client_from_url)

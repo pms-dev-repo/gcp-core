@@ -156,7 +156,8 @@ def create_or_get_registration_card(
             or registration_config.get("public_base_url")
             or "http://localhost:8501"
         ).rstrip("/")
-        public_url = f"{configured_url}/?registration_token={token}"
+        client_code = str(config.get("client", {}).get("code", "default"))
+        public_url = f"{configured_url}/?client={client_code}&registration_token={token}"
 
         now = datetime.now().isoformat(timespec="seconds")
         card = {

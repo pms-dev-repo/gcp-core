@@ -1,10 +1,8 @@
-GCP - DASHBOARD AL ACTUALIZAR CON F5
+Replace services/registration_card_service.py.
 
-Reemplaza solamente:
-- app.py
+In app.py add the snippet from APP_PATCH.txt immediately after st.set_page_config().
 
-Resultado:
-- Al abrir la aplicación: Dashboard
-- Al actualizar el navegador con F5: Dashboard
-- Al cambiar de hotel: Dashboard
-- La navegación normal entre módulos sigue funcionando
+Links will include:
+?client=accor&registration_token=...
+
+The app will load the correct hotel before validating the token.
