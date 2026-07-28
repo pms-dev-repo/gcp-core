@@ -28,7 +28,7 @@
   "modules": {
     "dashboard": true,
     "communications": false,
-    "confirmastion_letters": true,
+    "confirmation_letters": true,
     "registration_cards": true,
     "history": true,
     "templates": false,
