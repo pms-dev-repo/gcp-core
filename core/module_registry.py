@@ -18,7 +18,7 @@ MODULES = (
     ModuleDefinition("dashboard", "Dashboard", "▣", "main"),
     ModuleDefinition(
         "communications",
-        "Arrivals and Departures",
+        "Guest Letters",
         "✈",
         "guest_documents",
         parent="Guest Communications",
