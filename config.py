@@ -58,7 +58,8 @@ def get_active_client_code() -> str:
 
 
 @lru_cache(maxsize=32)
-def _load_client_config_by_code(code: str) -> dict[str, Any]:
+def load_client_config(client_code: str | None = None) -> dict[str, Any]:
+    code = client_code or get_active_client_code()
     path = CLIENTS_DIR / f"{code}.json"
 
     if not path.is_file():
@@ -79,16 +80,6 @@ def _load_client_config_by_code(code: str) -> dict[str, Any]:
     config["client"].setdefault("data_folder", code)
     config["client"].setdefault("templates_folder", code)
     return config
-
-
-def load_client_config(client_code: str | None = None) -> dict[str, Any]:
-    """Load configuration for the explicitly selected property.
-
-    Only the resolved client code is cached. This prevents a call made with
-    ``None`` from permanently reusing the first hotel's configuration.
-    """
-    code = str(client_code or get_active_client_code())
-    return _load_client_config_by_code(code)
 
 
 def module_enabled(module_key: str, config: dict[str, Any] | None = None) -> bool:

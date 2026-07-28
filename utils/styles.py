@@ -1523,3 +1523,36 @@ div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
         """,
         unsafe_allow_html=True,
     )
+
+# Dynamic dashboard styles
+def _dashboard_styles() -> None:
+    st.markdown(
+        """
+        <style>
+        .dashboard-hero{display:flex;justify-content:space-between;align-items:center;padding:26px 28px;margin:0 0 22px;background:linear-gradient(135deg,#30364c,#424a68);border-radius:14px;color:#fff;box-shadow:0 10px 28px rgba(48,54,76,.18)}
+        .dashboard-eyebrow{font-size:10px;font-weight:800;letter-spacing:1.4px;color:#f2cf62;margin-bottom:8px}
+        .dashboard-hero h1{font-size:25px;line-height:1.2;margin:0;color:#fff}.dashboard-hero p{margin:7px 0 0;color:#d9dce6;font-size:13px}
+        .dashboard-property-chip{padding:8px 12px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;white-space:nowrap}
+        .dashboard-section-title{font-size:14px;font-weight:800;color:#111827;letter-spacing:.2px;margin:2px 0 12px}.dashboard-section-spaced{margin-top:12px}
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-card-marker),div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-quick-marker){background:#fff!important;border:1px solid #dfe3ea!important;border-radius:12px!important;padding:19px!important;box-shadow:0 4px 14px rgba(17,24,39,.05)!important;height:100%}
+        .dashboard-card-marker,.dashboard-quick-marker{display:none}.dashboard-card-heading,.dashboard-quick-heading{display:flex;align-items:center;gap:12px;margin-bottom:17px}
+        .dashboard-card-icon,.dashboard-quick-icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:9px;background:rgba(0,104,140,.10);color:#00688c;font-size:20px;font-weight:800}
+        .dashboard-card-title,.dashboard-quick-title{font-size:15px;font-weight:800;color:#111827}.dashboard-card-description,.dashboard-quick-description{font-size:11px;color:#6b7280;margin-top:2px}
+        .dashboard-card-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:15px}.dashboard-metric{padding:11px;border:1px solid #e7e9ee;border-radius:8px;background:#fafbfc}
+        .dashboard-metric-label{font-size:10px;color:#6b7280}.dashboard-metric-value{font-size:22px;font-weight:800;color:#111827;margin-top:2px}
+        .dashboard-metric-sent{border-left:3px solid #10b981}.dashboard-metric-warning,.dashboard-metric-cancelled{border-left:3px solid #f59e0b}.dashboard-metric-generated{border-left:3px solid #3b82f6}.dashboard-metric-pending{border-left:3px solid #8b5cf6}
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-card-marker) button,div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-quick-marker) button{min-height:36px!important;background:#fff!important;color:#30364c!important;border:1px solid #cfd4de!important;box-shadow:none!important}
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-card-marker) button:hover,div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-quick-marker) button:hover{background:#30364c!important;color:#fff!important;transform:none!important}
+        @media(max-width:900px){.dashboard-hero{padding:21px 18px}.dashboard-property-chip{display:none}.dashboard-card-metrics{grid-template-columns:1fr 1fr}}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# Keep the existing public entry point while injecting dashboard CSS.
+_original_apply_global_styles = apply_global_styles
+
+def apply_global_styles() -> None:
+    _original_apply_global_styles()
+    _dashboard_styles()

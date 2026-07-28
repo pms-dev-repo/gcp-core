@@ -1,12 +1,10 @@
-FILES TO REPLACE
+GCP - DASHBOARD AL ACTUALIZAR CON F5
 
-modules/confirmation_letters/page.py
-services/guest_service.py
-services/document_service.py
-services/email_service.py
-data/accor/guests.json
+Reemplaza solamente:
+- app.py
 
-The document service first looks for confirmation_standard_en.docx and cancellation_standard_en.docx.
-If they do not exist, it uses arrival_standard_en.docx and departure_standard_en.docx as temporary fallbacks.
-
-The generated/sent state is kept in Streamlit session_state for this first test version.
+Resultado:
+- Al abrir la aplicación: Dashboard
+- Al actualizar el navegador con F5: Dashboard
+- Al cambiar de hotel: Dashboard
+- La navegación normal entre módulos sigue funcionando

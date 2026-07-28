@@ -6,7 +6,6 @@ import streamlit as st
 
 from core.config import (
     BASE_DIR,
-    enabled_modules,
     get_available_clients,
     get_default_client_code,
     load_client_config,
@@ -22,15 +21,6 @@ SECTION_LABELS = {
     "management": "MANAGEMENT",
     "help": "HELP",
 }
-
-
-def _default_page_for_config(config: dict) -> str:
-    active_modules = enabled_modules(config)
-    return (
-        "dashboard"
-        if "dashboard" in active_modules
-        else next(iter(active_modules), "about")
-    )
 
 
 def _set_active_page(page_key: str) -> None:
@@ -55,7 +45,7 @@ def _render_nav_content(module: ModuleDefinition, active: bool) -> None:
 
 def _nav_button(module: ModuleDefinition, indented: bool = False) -> None:
     active = (
-        st.session_state.get("active_page", "dashboard")
+        st.session_state.get("active_page", "communications")
         == module.key
     )
 
@@ -117,7 +107,6 @@ def _render_hotel_selector() -> None:
             get_default_client_code(),
         )
     )
-
     if active_code not in code_to_name:
         active_code = codes[0]
         st.session_state.active_client_code = active_code
@@ -137,13 +126,10 @@ def _render_hotel_selector() -> None:
     )
 
     if selected_code != active_code:
-        # Clear all property-specific state, preserve the selected hotel,
-        # and always return to Dashboard when it is enabled.
+        # Preserve the selected property after clearing property-specific state.
         reset_client_state()
         st.session_state.active_client_code = selected_code
-
-        selected_config = load_client_config(selected_code)
-        st.session_state.active_page = _default_page_for_config(selected_config)
+        st.session_state.active_page = "communications"
         st.rerun()
 
     st.markdown(
@@ -164,7 +150,6 @@ def render_sidebar() -> None:
     )
     config = load_client_config(client_code)
 
-    # Only modules enabled in the active hotel's JSON are displayed.
     visible = [
         module
         for module in MODULES

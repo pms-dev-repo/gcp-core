@@ -12,6 +12,7 @@ from core.config import (
     load_client_config,
 )
 from modules.communications.page import render as render_communications
+from modules.dashboard.page import render as render_dashboard
 from modules.confirmation_letters.page import render as render_confirmation_letters
 from modules.registration_cards.guest_form import (
     render_guest_registration_form,
@@ -51,11 +52,23 @@ apply_global_styles()
 guests = load_guests(client_code)
 initialize_state(guests)
 
-# Keep the selected module only when it is enabled for the active property.
-if st.session_state.get("active_page") not in active_modules:
+# Always open Dashboard on the first run of a browser session.
+# A full browser refresh (F5) creates a new Streamlit session, so this
+# sends the user back to Dashboard without affecting normal navigation.
+if not st.session_state.get("gcp_session_initialized", False):
     st.session_state.active_page = (
-        "communications"
-        if "communications" in active_modules
+        "dashboard"
+        if "dashboard" in active_modules
+        else next(iter(active_modules), "about")
+    )
+    st.session_state.gcp_session_initialized = True
+
+# If the selected page is not enabled for the active property,
+# return to Dashboard when available.
+elif st.session_state.get("active_page") not in active_modules:
+    st.session_state.active_page = (
+        "dashboard"
+        if "dashboard" in active_modules
         else next(iter(active_modules), "about")
     )
 
@@ -66,7 +79,9 @@ with st.sidebar:
 
 active_page = st.session_state.active_page
 
-if active_page == "communications":
+if active_page == "dashboard":
+    render_dashboard(guests)
+elif active_page == "communications":
     render_communications(guests)
 elif active_page == "confirmation_letters":
     render_confirmation_letters()
