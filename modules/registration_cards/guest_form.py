@@ -5,6 +5,7 @@ from datetime import date
 from typing import Any
 
 import streamlit as st
+import streamlit.components.v1 as components
 from PIL import Image
 
 from services.registration_card_service import (
@@ -234,28 +235,7 @@ def render_guest_registration_form(token: str) -> None:
         )
 
     if submitted:
-        errors = []
-
-        if not email.strip():
-            errors.append("Email is required.")
-        if not document_number.strip():
-            errors.append("Document number is required.")
-        if not address.strip():
-            errors.append("Home address is required.")
-        if not country.strip():
-            errors.append("Country of residence is required.")
-        if not privacy_consent:
-            errors.append("Privacy consent is required.")
-        if not typed_signature.strip():
-            errors.append("Full legal name is required.")
-        if not _has_visible_signature(signature_png):
-            errors.append("Please draw your signature.")
-
-        if errors:
-            for error in errors:
-                st.error(error)
-            return
-
+        # Demo mode: all guest-entered fields, consents and signature are optional.
         response: dict[str, Any] = {
             "phone": phone.strip(),
             "email": email.strip(),
@@ -281,7 +261,28 @@ def render_guest_registration_form(token: str) -> None:
         )
 
         st.success(
-            "Your registration card was submitted and signed successfully.",
+            "Your registration card was submitted successfully.",
             icon="✅",
         )
         st.balloons()
+
+        # Attempt to close the public registration tab after submission.
+        # Browsers only allow window.close() automatically when the tab was
+        # opened by script. If blocked, the guest sees a completion message.
+        components.html(
+            """
+            <script>
+                setTimeout(function () {
+                    window.parent.close();
+                    window.close();
+                }, 1800);
+            </script>
+            """,
+            height=0,
+        )
+
+        st.info(
+            "Registration completed. This tab will close automatically. "
+            "If your browser blocks it, you can close it now."
+        )
+        st.stop()
