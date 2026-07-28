@@ -21,7 +21,7 @@
   "registration_cards": {
     "enabled": true,
     "correlative_prefix": "RC",
-    "public_base_url": "http://https://gcp-app.streamlit.app/",
+    "public_base_url": "https://gcp-app.streamlit.app/",
     "country": "Peru",
     "require_signature": true
   },
