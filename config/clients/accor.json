@@ -27,11 +27,11 @@
   },
   "modules": {
     "dashboard": true,
-    "communications": true,
-    "confirmation_letters": true,
+    "communications": false,
+    "confirmastion_letters": true,
     "registration_cards": true,
     "history": true,
-    "templates": true,
+    "templates": false,
     "administration": true,
     "settings": true,
     "about": true
