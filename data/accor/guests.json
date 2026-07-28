@@ -1,0 +1,244 @@
+{
+  "guests": [
+    {
+      "id": "acc-arr-4001001",
+      "movement": "Arrivals",
+      "confirmation_number": "4001001",
+      "reservation_name_id": "78001001",
+      "salutation": "Sr.",
+      "first_name": "Carlos",
+      "last_name": "Ramírez Soto",
+      "full_name": "Carlos Ramírez Soto",
+      "company": "Andes Consulting S.A.C.",
+      "room": "TBA",
+      "room_type": "KING SUPERIOR",
+      "rate_code": "BAR",
+      "vip_level": "Gold",
+      "email": "carlos.ramirez@example.com",
+      "phone": "+51 987 654 321",
+      "nationality": "Peruana",
+      "document_type": "DNI",
+      "document_number": "45871236",
+      "letter_date": "28 July 2026",
+      "stay": {
+        "arrival_date": "Jul 29, 2026",
+        "departure_date": "Aug 2, 2026",
+        "nights": 4,
+        "adults": 1,
+        "children": 0
+      },
+      "transport": {
+        "eta": "3:00 PM",
+        "flight": "LA2045",
+        "transfer": "None"
+      },
+      "template": {
+        "code": "REGISTRATION_CARD_PE",
+        "name": "Accor Peru Registration Card",
+        "language": "Spanish",
+        "file_name": "registration_card_pe.docx",
+        "document_prefix": "RC"
+      }
+    },
+    {
+      "id": "acc-arr-4001002",
+      "movement": "Arrivals",
+      "confirmation_number": "4001002",
+      "reservation_name_id": "78001002",
+      "salutation": "Sra.",
+      "first_name": "María Fernanda",
+      "last_name": "Torres Vega",
+      "full_name": "María Fernanda Torres Vega",
+      "company": "",
+      "room": "TBA",
+      "room_type": "TWIN DELUXE",
+      "rate_code": "ADVANCE",
+      "vip_level": "Standard",
+      "email": "maria.torres@example.com",
+      "phone": "+51 955 214 876",
+      "nationality": "Peruana",
+      "document_type": "DNI",
+      "document_number": "70458963",
+      "letter_date": "28 July 2026",
+      "stay": {
+        "arrival_date": "Jul 29, 2026",
+        "departure_date": "Jul 31, 2026",
+        "nights": 2,
+        "adults": 2,
+        "children": 1
+      },
+      "transport": {
+        "eta": "5:30 PM",
+        "flight": "",
+        "transfer": "Taxi"
+      },
+      "template": {
+        "code": "REGISTRATION_CARD_PE",
+        "name": "Accor Peru Registration Card",
+        "language": "Spanish",
+        "file_name": "registration_card_pe.docx",
+        "document_prefix": "RC"
+      }
+    },
+    {
+      "id": "acc-arr-4001003",
+      "movement": "Arrivals",
+      "confirmation_number": "4001003",
+      "reservation_name_id": "78001003",
+      "salutation": "Mr.",
+      "first_name": "John",
+      "last_name": "Miller",
+      "full_name": "John Miller",
+      "company": "Pacific Mining Ltd.",
+      "room": "TBA",
+      "room_type": "KING EXECUTIVE",
+      "rate_code": "CORP",
+      "vip_level": "Platinum",
+      "email": "john.miller@example.com",
+      "phone": "+1 305 555 0198",
+      "nationality": "Estadounidense",
+      "document_type": "Passport",
+      "document_number": "594183720",
+      "letter_date": "28 July 2026",
+      "stay": {
+        "arrival_date": "Jul 30, 2026",
+        "departure_date": "Aug 4, 2026",
+        "nights": 5,
+        "adults": 1,
+        "children": 0
+      },
+      "transport": {
+        "eta": "11:20 PM",
+        "flight": "AA917",
+        "transfer": "Hotel transfer"
+      },
+      "template": {
+        "code": "REGISTRATION_CARD_PE",
+        "name": "Accor Peru Registration Card",
+        "language": "English",
+        "file_name": "registration_card_pe.docx",
+        "document_prefix": "RC"
+      }
+    },
+    {
+      "id": "acc-arr-4001004",
+      "movement": "Arrivals",
+      "confirmation_number": "4001004",
+      "reservation_name_id": "78001004",
+      "salutation": "Sra.",
+      "first_name": "Valentina",
+      "last_name": "Rojas Paredes",
+      "full_name": "Valentina Rojas Paredes",
+      "company": "",
+      "room": "TBA",
+      "room_type": "QUEEN SUPERIOR",
+      "rate_code": "BAR",
+      "vip_level": "Standard",
+      "email": "valentina.rojas@example.com",
+      "phone": "+56 9 6321 8874",
+      "nationality": "Chilena",
+      "document_type": "Passport",
+      "document_number": "F48273190",
+      "letter_date": "28 July 2026",
+      "stay": {
+        "arrival_date": "Jul 30, 2026",
+        "departure_date": "Aug 1, 2026",
+        "nights": 2,
+        "adults": 2,
+        "children": 0
+      },
+      "transport": {
+        "eta": "2:40 PM",
+        "flight": "LA2370",
+        "transfer": "None"
+      },
+      "template": {
+        "code": "REGISTRATION_CARD_PE",
+        "name": "Accor Peru Registration Card",
+        "language": "Spanish",
+        "file_name": "registration_card_pe.docx",
+        "document_prefix": "RC"
+      }
+    },
+    {
+      "id": "acc-arr-4001005",
+      "movement": "Arrivals",
+      "confirmation_number": "4001005",
+      "reservation_name_id": "78001005",
+      "salutation": "Sr.",
+      "first_name": "Diego",
+      "last_name": "Salazar Núñez",
+      "full_name": "Diego Salazar Núñez",
+      "company": "Grupo Inka S.A.",
+      "room": "TBA",
+      "room_type": "KING DELUXE",
+      "rate_code": "CORP",
+      "vip_level": "Gold",
+      "email": "diego.salazar@example.com",
+      "phone": "+51 944 700 221",
+      "nationality": "Peruana",
+      "document_type": "DNI",
+      "document_number": "41259876",
+      "letter_date": "28 July 2026",
+      "stay": {
+        "arrival_date": "Jul 31, 2026",
+        "departure_date": "Aug 3, 2026",
+        "nights": 3,
+        "adults": 1,
+        "children": 0
+      },
+      "transport": {
+        "eta": "4:15 PM",
+        "flight": "",
+        "transfer": "Private car"
+      },
+      "template": {
+        "code": "REGISTRATION_CARD_PE",
+        "name": "Accor Peru Registration Card",
+        "language": "Spanish",
+        "file_name": "registration_card_pe.docx",
+        "document_prefix": "RC"
+      }
+    },
+    {
+      "id": "acc-arr-4001006",
+      "movement": "Arrivals",
+      "confirmation_number": "4001006",
+      "reservation_name_id": "78001006",
+      "salutation": "Ms.",
+      "first_name": "Emily",
+      "last_name": "Johnson",
+      "full_name": "Emily Johnson",
+      "company": "",
+      "room": "TBA",
+      "room_type": "TWIN SUPERIOR",
+      "rate_code": "BAR",
+      "vip_level": "Standard",
+      "email": "",
+      "phone": "+44 7700 900123",
+      "nationality": "Británica",
+      "document_type": "Passport",
+      "document_number": "903817462",
+      "letter_date": "28 July 2026",
+      "stay": {
+        "arrival_date": "Jul 31, 2026",
+        "departure_date": "Aug 5, 2026",
+        "nights": 5,
+        "adults": 2,
+        "children": 0
+      },
+      "transport": {
+        "eta": "7:10 PM",
+        "flight": "IB6659",
+        "transfer": "Hotel transfer"
+      },
+      "template": {
+        "code": "REGISTRATION_CARD_PE",
+        "name": "Accor Peru Registration Card",
+        "language": "English",
+        "file_name": "registration_card_pe.docx",
+        "document_prefix": "RC"
+      }
+    }
+  ]
+}

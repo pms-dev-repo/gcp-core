@@ -1,0 +1,38 @@
+{
+  "client": {
+    "code": "sandy_lane",
+    "name": "Sandy Lane",
+    "timezone": "America/Barbados",
+    "language": "en",
+    "data_folder": "sandy_lane",
+    "templates_folder": "sandy_lane",
+    "generated_folder": "sandy_lane",
+    "user": {
+      "initials": "FD",
+      "code": "FD001"
+    },
+    "branding": {
+      "product_name": "GCP",
+      "product_subtitle": "Guest Communication Platform",
+      "primary_color": "#30364C",
+      "accent_color": "#00688C"
+    }
+  },
+  "modules": {
+    "dashboard": true,
+    "communications": true,
+    "confirmation_letters": false,
+    "registration_cards": false,
+    "history": false,
+    "templates": true,
+    "administration": true,
+    "settings": false,
+    "about": true
+  },
+  "document_types": {
+    "arrival_letter": true,
+    "departure_letter": true,
+    "confirmation_letter": false,
+    "registration_card": false
+  }
+}

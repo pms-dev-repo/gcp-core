@@ -1,0 +1,13 @@
+GCP OPERA Cloud Sidebar Refactor
+
+Changes:
+- Sidebar now uses Streamlit's independent sidebar layer.
+- Main workspace remains white with the navigation open or closed.
+- Sidebar fill is exactly #3c425a.
+- Header burger shows and hides navigation.
+- Active navigation item remains highlighted.
+- Existing Guest Communications workflow is preserved.
+
+Run:
+    pip install -r requirements.txt
+    streamlit run app.py
