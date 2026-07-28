@@ -35,6 +35,7 @@ def _signature_canvas(key: str) -> bytes | None:
         height=180,
         width=700,
         drawing_mode="freedraw",
+        update_streamlit=False,
         key=key,
     )
 
@@ -43,21 +44,24 @@ def _signature_canvas(key: str) -> bytes | None:
 
     image = Image.fromarray(canvas.image_data.astype("uint8"), "RGBA")
     buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
+    image.save(buffer, format="PNG", optimize=True)
     return buffer.getvalue()
 
 
-def _has_visible_signature(signature_png: bytes | None) -> bool:
-    if not signature_png:
-        return False
+def _load_card_once(token: str) -> dict[str, Any] | None:
+    """
+    Avoid a Supabase read/update every time Streamlit reruns the page.
 
-    image = Image.open(io.BytesIO(signature_png)).convert("RGBA")
-    pixels = image.getdata()
+    The drawable canvas and other inputs can trigger reruns. The card is marked
+    as opened only once during this browser session and then kept in session.
+    """
+    cache_key = f"registration_public_card_{token}"
 
-    for red, green, blue, alpha in pixels:
-        if alpha > 0 and min(red, green, blue) < 245:
-            return True
-    return False
+    if cache_key not in st.session_state:
+        st.session_state[cache_key] = mark_card_opened(token)
+
+    card = st.session_state.get(cache_key)
+    return dict(card) if card else None
 
 
 def render_guest_registration_form(token: str) -> None:
@@ -67,7 +71,7 @@ def render_guest_registration_form(token: str) -> None:
         layout="centered",
     )
 
-    card = mark_card_opened(token)
+    card = _load_card_once(token)
     if not card:
         st.error("This registration-card link is invalid or has expired.")
         st.stop()
@@ -110,9 +114,7 @@ def render_guest_registration_form(token: str) -> None:
             "Thank you. Your registration card was already completed and signed.",
             icon="✅",
         )
-        st.write(
-            f"Completed at: `{card.get('completed_at', '—')}`"
-        )
+        st.write(f"Completed at: `{card.get('completed_at', '—')}`")
         return
 
     st.info(
@@ -222,8 +224,6 @@ def render_guest_registration_form(token: str) -> None:
             "Use your finger on a mobile device, or the mouse on a computer."
         )
 
-        # The canvas itself must be rendered outside the form submit callback,
-        # but it is still part of the visible form.
         signature_png = _signature_canvas(
             f"registration_signature_{card['registration_card_number']}"
         )
@@ -235,7 +235,6 @@ def render_guest_registration_form(token: str) -> None:
         )
 
     if submitted:
-        # Demo mode: all guest-entered fields, consents and signature are optional.
         response: dict[str, Any] = {
             "phone": phone.strip(),
             "email": email.strip(),
@@ -254,11 +253,14 @@ def render_guest_registration_form(token: str) -> None:
             "typed_signature": typed_signature.strip(),
         }
 
-        save_guest_response(
-            token=token,
-            response=response,
-            signature_png=signature_png or b"",
-        )
+        with st.spinner("Submitting registration card..."):
+            updated_card = save_guest_response(
+                token=token,
+                response=response,
+                signature_png=signature_png or b"",
+            )
+
+        st.session_state[f"registration_public_card_{token}"] = updated_card
 
         st.success(
             "Your registration card was submitted successfully.",
@@ -266,9 +268,6 @@ def render_guest_registration_form(token: str) -> None:
         )
         st.balloons()
 
-        # Attempt to close the public registration tab after submission.
-        # Browsers only allow window.close() automatically when the tab was
-        # opened by script. If blocked, the guest sees a completion message.
         components.html(
             """
             <script>

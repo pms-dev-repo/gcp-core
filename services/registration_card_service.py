@@ -299,8 +299,14 @@ def save_guest_response(
     response: dict[str, Any],
     signature_png: bytes,
 ) -> dict[str, Any]:
-    card = get_card_by_token(token)
-    if not card:
+    """
+    Save the completed form with a single Supabase request.
+
+    The previous implementation first selected the card and then updated it.
+    Updating directly by token removes one network round trip.
+    """
+    token = str(token or "").strip()
+    if not token:
         raise KeyError("The registration-card link is invalid or expired.")
 
     signature_base64 = base64.b64encode(signature_png).decode("ascii")
@@ -322,7 +328,7 @@ def save_guest_response(
                     "response": response_payload,
                 }
             )
-            .eq("token", str(token))
+            .eq("token", token)
             .execute()
         )
         updated = _first_row(result)

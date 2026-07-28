@@ -5,14 +5,14 @@ from typing import Any
 
 import streamlit as st
 
+from core.config import get_default_client_code, load_client_config
 from services.email_service import send_registration_card_email
 from services.guest_service import load_guests
 from services.registration_card_service import (
     create_or_get_registration_card,
-    get_card_by_guest_id,
     list_registration_cards,
 )
-from core.config import get_default_client_code, load_client_config
+
 
 def _status_badge(status: str) -> str:
     colors = {
@@ -22,10 +22,7 @@ def _status_badge(status: str) -> str:
         "Opened": ("#F5F3FF", "#6D28D9"),
         "Signed": ("#ECFDF5", "#047857"),
     }
-    background, foreground = colors.get(
-        status,
-        ("#F3F4F6", "#4B5563"),
-    )
+    background, foreground = colors.get(status, ("#F3F4F6", "#4B5563"))
     return (
         f'<span style="display:inline-block;padding:3px 9px;'
         f'border-radius:999px;background:{background};color:{foreground};'
@@ -36,6 +33,7 @@ def _status_badge(status: str) -> str:
 def _matches(guest: dict[str, Any], term: str) -> bool:
     if not term:
         return True
+
     needle = term.casefold()
     values = (
         guest.get("full_name"),
@@ -47,12 +45,22 @@ def _matches(guest: dict[str, Any], term: str) -> bool:
     return any(needle in str(value or "").casefold() for value in values)
 
 
-def _registration_status(guest: dict[str, Any]) -> str:
-    card = get_card_by_guest_id(str(guest["id"]))
-    return str(card.get("status")) if card else "Ready"
+def _cards_by_guest(
+    cards: list[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Build an in-memory lookup and avoid one Supabase query per guest."""
+    lookup: dict[str, dict[str, Any]] = {}
+    for card in cards:
+        guest_id = str(card.get("guest_id") or "")
+        if guest_id and guest_id not in lookup:
+            lookup[guest_id] = card
+    return lookup
 
 
-def _render_guest_list(guests: list[dict[str, Any]]) -> None:
+def _render_guest_list(
+    guests: list[dict[str, Any]],
+    cards_by_guest: dict[str, dict[str, Any]],
+) -> None:
     st.markdown("### Upcoming arrivals")
 
     search = st.text_input(
@@ -78,7 +86,8 @@ def _render_guest_list(guests: list[dict[str, Any]]) -> None:
                 st.session_state.get("registration_selected_guest_id")
                 == guest_id
             )
-            status = _registration_status(guest)
+            card = cards_by_guest.get(guest_id)
+            status = str(card.get("status")) if card else "Ready"
             stay = guest.get("stay", {})
 
             with st.container(border=True):
@@ -90,10 +99,7 @@ def _render_guest_list(guests: list[dict[str, Any]]) -> None:
                     f"Room {guest.get('room') or 'TBA'} · "
                     f"Arrival {stay.get('arrival_date', '—')}"
                 )
-                st.markdown(
-                    _status_badge(status),
-                    unsafe_allow_html=True,
-                )
+                st.markdown(_status_badge(status), unsafe_allow_html=True)
 
                 if st.button(
                     "Selected" if selected else "Open Registration Card",
@@ -106,9 +112,12 @@ def _render_guest_list(guests: list[dict[str, Any]]) -> None:
                     st.rerun()
 
 
-def _render_summary(guest: dict[str, Any]) -> None:
+def _render_summary(
+    guest: dict[str, Any],
+    cards_by_guest: dict[str, dict[str, Any]],
+) -> None:
     guest_id = str(guest["id"])
-    card = get_card_by_guest_id(guest_id)
+    card = cards_by_guest.get(guest_id)
     stay = guest.get("stay", {})
 
     st.markdown("### Registration Card")
@@ -121,9 +130,11 @@ def _render_summary(guest: dict[str, Any]) -> None:
         left, right = st.columns(2)
         left.metric(
             "Correlative",
-            card.get("registration_card_number", "Assigned on generation")
-            if card
-            else "Assigned on generation",
+            (
+                card.get("registration_card_number", "Assigned on generation")
+                if card
+                else "Assigned on generation"
+            ),
         )
         right.metric("Status", card.get("status", "Ready") if card else "Ready")
 
@@ -155,16 +166,17 @@ def _render_summary(guest: dict[str, Any]) -> None:
             "1. Generate Registration Card",
             key=f"registration_generate_{guest_id}",
             type="primary",
+            disabled=card is not None,
             use_container_width=True,
         ):
-            card = create_or_get_registration_card(guest)
+            with st.spinner("Generating registration card..."):
+                created = create_or_get_registration_card(guest)
+
             st.toast(
-                f"{card['registration_card_number']} generated.",
+                f"{created['registration_card_number']} generated.",
                 icon="✅",
             )
             st.rerun()
-
-        card = get_card_by_guest_id(guest_id)
 
         if card:
             st.text_input(
@@ -183,7 +195,10 @@ def _render_summary(guest: dict[str, Any]) -> None:
                 ),
                 use_container_width=True,
             ):
-                if send_registration_card_email(guest, card):
+                with st.spinner("Sending guest form..."):
+                    sent = send_registration_card_email(guest, card)
+
+                if sent:
                     st.success(
                         f"Demo email sent to {guest['email']}.",
                         icon="📧",
@@ -219,8 +234,7 @@ def _render_summary(guest: dict[str, Any]) -> None:
                 )
 
 
-def _render_history() -> None:
-    cards = list_registration_cards()
+def _render_history(cards: list[dict[str, Any]]) -> None:
     st.markdown("### Recent Registration Cards")
 
     if not cards:
@@ -258,7 +272,7 @@ def render() -> None:
             get_default_client_code(),
         )
     )
-    config = load_client_config(client_code)
+    load_client_config(client_code)
     guests = load_guests(client_code)
 
     arrivals = [
@@ -267,29 +281,33 @@ def render() -> None:
 
     st.session_state.setdefault(
         "registration_selected_guest_id",
-        arrivals[0]["id"] if arrivals else None,
+        str(arrivals[0]["id"]) if arrivals else None,
     )
 
     selected_guest = next(
         (
             guest
             for guest in arrivals
-            if guest.get("id")
-            == st.session_state.registration_selected_guest_id
+            if str(guest.get("id"))
+            == str(st.session_state.registration_selected_guest_id)
         ),
         None,
     )
 
+    # One Supabase query per page render instead of one query per guest.
+    cards = list_registration_cards()
+    cards_lookup = _cards_by_guest(cards)
+
     list_col, detail_col = st.columns([0.38, 0.62], gap="large")
 
     with list_col:
-        _render_guest_list(guests)
+        _render_guest_list(guests, cards_lookup)
 
     with detail_col:
         if selected_guest:
-            _render_summary(selected_guest)
+            _render_summary(selected_guest, cards_lookup)
         else:
             st.info("Select an arrival to prepare its registration card.")
 
     st.markdown("---")
-    _render_history()
+    _render_history(cards)
