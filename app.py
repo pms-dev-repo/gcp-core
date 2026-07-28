@@ -22,7 +22,7 @@ from modules.shared_placeholder import render_module_placeholder
 from services.guest_service import load_guests
 from utils.state import initialize_state
 from utils.styles import apply_global_styles
-
+from services.database import get_supabase
 
 registration_token = st.query_params.get("registration_token")
 if registration_token:
@@ -102,3 +102,19 @@ else:
         titles.get(active_page, "GCP"),
         "This module is enabled and ready for its implementation phase.",
     )
+try:
+    supabase = get_supabase()
+
+    result = (
+        supabase
+        .table("registration_cards")
+        .select("id")
+        .limit(1)
+        .execute()
+    )
+
+    st.success("✅ Connected to Supabase")
+    st.write(result.data)
+
+except Exception as e:
+    st.error(e)
