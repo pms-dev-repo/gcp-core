@@ -42,6 +42,11 @@ def initialize_state(guests: list[dict[str, Any]]) -> None:
         "applied_arrival_to": default_date,
         "applied_departure_from": default_date,
         "applied_departure_to": default_date,
+        "transport_selected_guest_id": None,
+        "transport_selected_date": default_date,
+        "transport_direction_filter": "All",
+        "transport_status_filter": "All",
+        "transport_search": "",
     }
 
     for key, value in defaults.items():
@@ -145,6 +150,11 @@ def reset_client_state() -> None:
         "activity",
         "word_opened",
         "email_sent",
+        "transport_selected_guest_id",
+        "transport_selected_date",
+        "transport_direction_filter",
+        "transport_status_filter",
+        "transport_search",
     )
 
     for key in keys_to_reset:

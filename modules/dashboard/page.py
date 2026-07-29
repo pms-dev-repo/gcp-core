@@ -25,6 +25,11 @@ MODULE_META: dict[str, dict[str, str]] = {
         "title": "Registration Cards",
         "description": "Pre-arrival registration workflow",
     },
+    "guest_transportation": {
+        "icon": "🚐",
+        "title": "Guest Transportation",
+        "description": "Daily pickups, drop-offs and transfer operations",
+    },
     "history": {
         "icon": "◷",
         "title": "Document History",
@@ -124,6 +129,29 @@ def _communication_metrics(guests: list[dict[str, Any]]) -> list[tuple[str, int,
     return [("Arrivals", arrivals, "arrival"), ("Departures", departures, "departure"), ("Sent", sent, "sent"), ("Missing email", missing_email, "warning")]
 
 
+def _transportation_metrics(guests: list[dict[str, Any]]) -> list[tuple[str, int, str]]:
+    transfers = [
+        guest
+        for guest in guests
+        if str((guest.get("transport") or {}).get("transfer") or "").strip()
+        not in {"", "None"}
+    ]
+    arrivals = sum(1 for guest in transfers if _movement(guest) in {"arrival", "arrivals"})
+    departures = sum(1 for guest in transfers if _movement(guest) in {"departure", "departures"})
+    assigned = sum(
+        1
+        for guest in transfers
+        if str((guest.get("transport") or {}).get("transfer") or "").strip()
+        not in {"", "None"}
+    )
+    return [
+        ("Transfers", len(transfers), "generated"),
+        ("Arrivals", arrivals, "arrival"),
+        ("Departures", departures, "departure"),
+        ("Assigned", assigned, "sent"),
+    ]
+
+
 def _open_module(module_key: str) -> None:
     st.session_state.active_page = module_key
     st.rerun()
@@ -209,6 +237,8 @@ def render(guests: list[dict[str, Any]] | None = None) -> None:
         operational.append(("confirmation_letters", _confirmation_metrics(guests)))
     if module_enabled("registration_cards", config):
         operational.append(("registration_cards", _registration_metrics(guests)))
+    if module_enabled("guest_transportation", config):
+        operational.append(("guest_transportation", _transportation_metrics(guests)))
 
     if operational:
         st.markdown('<div class="dashboard-section-title">Operational modules</div>', unsafe_allow_html=True)

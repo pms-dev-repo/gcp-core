@@ -36,7 +36,8 @@
     "templates": true,
     "administration": true,
     "settings": true,
-    "about": true
+    "about": true,
+    "guest_transportation": true
   },
   "document_types": {
     "arrival_letter": true,

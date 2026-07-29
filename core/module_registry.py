@@ -37,6 +37,13 @@ MODULES = (
         "front_office",
         parent="Front Office",
     ),
+    ModuleDefinition(
+        "guest_transportation",
+        "Guest Transportation",
+        "🚐",
+        "front_office",
+        parent="Front Office",
+    ),
     ModuleDefinition("history", "Document History", "◷", "main"),
     ModuleDefinition("administration", "Administration", "⚙", "management"),
     ModuleDefinition("templates", "Template Studio", "▤", "management"),

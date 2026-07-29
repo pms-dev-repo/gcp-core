@@ -13,6 +13,7 @@ from core.config import (
 )
 from modules.communications.page import render as render_communications
 from modules.dashboard.page import render as render_dashboard
+from modules.guest_transportation.page import render as render_guest_transportation
 from modules.confirmation_letters.page import render as render_confirmation_letters
 from modules.registration_cards.guest_form import (
     render_guest_registration_form,
@@ -87,6 +88,8 @@ elif active_page == "confirmation_letters":
     render_confirmation_letters()
 elif active_page == "registration_cards":
     render_registration_cards()
+elif active_page == "guest_transportation":
+    render_guest_transportation()
 elif active_page == "administration":
     render_administration()
 elif active_page == "templates":

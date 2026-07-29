@@ -1,20 +1,22 @@
-GCP - Registration Cards with Supabase
-======================================
+GUEST TRANSPORTATION MODULE
 
-1. Copy services/database.py into your project's services folder.
-2. Replace services/registration_card_service.py with the supplied file.
-3. Confirm that "supabase" exists in requirements.txt.
-4. Configure Streamlit Secrets using .streamlit/secrets.toml.example as a guide.
-   Never commit your real secrets.toml file to GitHub.
-5. Run supabase_registration_cards.sql in Supabase SQL Editor.
-6. Remove the temporary Supabase connection test from app.py.
-7. Deploy/restart Streamlit Cloud.
-8. Generate a NEW registration card. Old links stored only in JSON will not exist
-   in Supabase and will remain invalid.
-9. Verify in Supabase:
-   - Generated after creating the card
-   - Opened after opening the public URL
-   - Signed after submitting the signature form
+Copy these files into the same paths in your project:
 
-The public functions remain compatible with the existing page.py, guest_form.py,
-and email_service.py.
+app.py
+core/module_registry.py
+modules/dashboard/page.py
+modules/guest_transportation/__init__.py
+modules/guest_transportation/page.py
+utils/state.py
+config/clients/GCPHOTEL.json
+
+This first demo version:
+- Uses the existing transport data inside guests.json.
+- Provides daily filters, KPIs, operational list and editable transfer workflow.
+- Lets you assign driver, vehicle, pickup location, destination and status.
+- Stores edits in Streamlit session_state for the demo.
+
+Important:
+Edits remain available during the current browser session only.
+The next phase should store transportation records in Supabase so they persist
+after refreshes, redeployments and across multiple users.
