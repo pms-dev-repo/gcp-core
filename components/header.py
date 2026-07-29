@@ -54,6 +54,7 @@ def render_header() -> None:
     client = config.get("client") or {}
 
     local_now = _get_hotel_datetime(config)
+    timezone_abbr = local_now.tzname()
 
     date_text = local_now.strftime("%A, %d %b, %Y")
     time_text = local_now.strftime("%I:%M %p").lstrip("0")
@@ -91,7 +92,12 @@ def render_header() -> None:
         '<div class="gcp-header-right">'
         '<div class="gcp-date-time">'
         f'<div class="gcp-date">{date_text}</div>'
-        f'<div class="gcp-time">{time_text}</div>'
+        f'''
+          <div class="gcp-time">
+               {time_text}
+          <span class="gcp-tz">{timezone_abbr}</span>
+         </div>
+        </div>
         '</div>'
         f'<div class="gcp-active-hotel-chip">{hotel_name}</div>'
         '<div class="gcp-user">'

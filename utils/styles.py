@@ -57,10 +57,18 @@ def apply_global_styles() -> None:
         }
 
         .gcp-tz{
-            margin-left:4px;
-            color:#f2cf62;
-            font-weight:700;
-            font-size:11px;
+        display:inline-block;
+        margin-left:6px;
+        padding:1px 6px;
+        border-radius:10px;
+
+        background:rgba(242,207,98,.18);
+        color:#f2cf62;
+
+        font-size:10px;
+        font-weight:700;
+        letter-spacing:.3px;
+        vertical-align:middle;
         }
 
         /* ===========================
