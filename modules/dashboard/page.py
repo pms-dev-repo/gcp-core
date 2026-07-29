@@ -77,6 +77,11 @@ MODULE_META: dict[str, dict[str, str]] = {
         "title": "Guest Transportation",
         "description": "Daily pickups, drop-offs and transfer operations",
     },
+    "flight_center": {
+        "icon": "✈",
+        "title": "Flight Center",
+        "description": "Search airlines, airports, cities, countries and routes",
+    },
     "history": {
         "icon": "◷",
         "title": "Document History",
@@ -287,6 +292,17 @@ def render(guests: list[dict[str, Any]] | None = None) -> None:
         operational.append(("registration_cards", _registration_metrics(guests)))
     if module_enabled("guest_transportation", config):
         operational.append(("guest_transportation", _transportation_metrics(guests)))
+    if module_enabled("flight_center", config):
+        operational.append(
+            (
+                "flight_center",
+                [
+                    ("Airlines", 0, "generated"),
+                    ("Airports", 0, "arrival"),
+                    ("Routes", 0, "sent"),
+                ],
+            )
+        )
 
     if operational:
         st.markdown('<div class="dashboard-section-title">Operational modules</div>', unsafe_allow_html=True)

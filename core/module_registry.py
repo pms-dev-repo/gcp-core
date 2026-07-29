@@ -44,6 +44,13 @@ MODULES = (
         "front_office",
         parent="Front Office",
     ),
+    ModuleDefinition(
+        "flight_center",
+        "Flight Center",
+        "✈",
+        "front_office",
+        parent="Front Office",
+    ),
     ModuleDefinition("history", "Document History", "◷", "main"),
     ModuleDefinition("administration", "Administration", "⚙", "management"),
     ModuleDefinition("templates", "Template Studio", "▤", "management"),

@@ -1,11 +1,15 @@
-GCP Sidebar Submenu v1.12
+GCP Flight Center — Batch 1
 
-Fix:
-- Forces Guest Letters to white using both:
-  color: #ffffff
-  -webkit-text-fill-color: #ffffff
-- Adds selectors scoped to Streamlit's sidebar.
-- Keeps all module visibility flags.
+1. Run sql/001_openflights.sql in Supabase SQL Editor.
+2. Copy each file into the matching project folder.
+3. Install/update dependencies:
+   pip install -r requirements.txt
+4. Synchronize OpenFlights:
+   python -m scripts.sync_openflights
+5. Add the page routing in app.py so active_page == "flight_center"
+   imports and calls modules.flight_center.page.render.
 
-Replace:
-components/sidebar.py
+Important:
+- OpenFlights identifies airlines, airports and historical routes.
+- GCP assembles values such as BA + 254 = BA254.
+- OpenFlights does not validate that BA254 is a current scheduled service.

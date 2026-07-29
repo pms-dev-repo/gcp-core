@@ -37,7 +37,8 @@
     "administration": true,
     "settings": true,
     "about": true,
-    "guest_transportation": true
+    "guest_transportation": true,
+    "flight_center": true
   },
   "document_types": {
     "arrival_letter": true,
