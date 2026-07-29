@@ -19,14 +19,14 @@ MODULES = (
     ModuleDefinition(
         "communications",
         "Guest Letters",
-        "✈",
+        "✉",
         "guest_documents",
         parent="Guest Communications",
     ),
     ModuleDefinition(
         "confirmation_letters",
         "Confirmation Letters",
-        "✓",
+        "✉",
         "guest_documents",
         parent="Guest Communications",
     ),
