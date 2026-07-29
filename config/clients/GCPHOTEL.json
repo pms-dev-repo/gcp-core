@@ -1,0 +1,47 @@
+{
+  "client": {
+    "code": "GCPHOTEL",
+    "name": "GCP Hotel",
+    "country": "USA",
+    "city": "New York",
+    "timezone": "America/Lima",
+    "language": "en",
+    "data_folder": "GCPHOTEL",
+    "templates_folder": "accor",
+    "generated_folder": "GCPHOTEL",
+    "user": {
+      "initials": "GH",
+      "code": "GCP001"
+    },
+    "branding": {
+      "product_name": "GCP",
+      "product_subtitle": "Guest Communication Platform",
+      "primary_color": "#30364C",
+      "accent_color": "#00688C"
+    }
+  },
+  "registration_cards": {
+    "enabled": true,
+    "correlative_prefix": "RC",
+    "public_base_url": "https://gcp-app.streamlit.app",
+    "country": "USA",
+    "require_signature": false
+  },
+  "modules": {
+    "dashboard": true,
+    "communications": true,
+    "confirmation_letters": true,
+    "registration_cards": true,
+    "history": true,
+    "templates": true,
+    "administration": true,
+    "settings": true,
+    "about": true
+  },
+  "document_types": {
+    "arrival_letter": true,
+    "departure_letter": true,
+    "confirmation_letter": true,
+    "registration_card": true
+  }
+}
