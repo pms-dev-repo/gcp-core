@@ -56,6 +56,13 @@ def apply_global_styles() -> None:
             color:#111827;
         }
 
+        .gcp-tz{
+            margin-left:4px;
+            color:#f2cf62;
+            font-weight:700;
+            font-size:11px;
+        }
+
         /* ===========================
            PANELS
         =========================== */
