@@ -4,7 +4,7 @@
     "name": "GCP Hotel",
     "country": "USA",
     "city": "New York",
-    "timezone": "America/Lima",
+    "timezone": "America/New_York",
     "language": "en",
     "data_folder": "GCPHOTEL",
     "templates_folder": "accor",

@@ -1,12 +1,59 @@
 from __future__ import annotations
 
 from collections import Counter
+from datetime import datetime
 from html import escape
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import streamlit as st
 
 from core.config import get_active_client_code, load_client_config, module_enabled
+
+
+def _hotel_timezone(config: dict[str, Any]) -> str:
+    """
+    Return the property's configured IANA timezone.
+
+    Supported locations:
+    - config["client"]["timezone"]
+    - config["timezone"]
+    - config["property"]["timezone"]
+
+    Falls back safely to UTC when the value is missing.
+    """
+    client = config.get("client") or {}
+    property_config = config.get("property") or {}
+
+    timezone_name = (
+        client.get("timezone")
+        or config.get("timezone")
+        or property_config.get("timezone")
+        or "UTC"
+    )
+
+    return str(timezone_name).strip() or "UTC"
+
+
+def _hotel_now(config: dict[str, Any]) -> datetime:
+    """Return the current date and time in the property's timezone."""
+    timezone_name = _hotel_timezone(config)
+
+    try:
+        return datetime.now(ZoneInfo(timezone_name))
+    except (ZoneInfoNotFoundError, ValueError, TypeError):
+        return datetime.now(ZoneInfo("UTC"))
+
+
+def _hotel_greeting(config: dict[str, Any]) -> str:
+    """Return a greeting based on the property's local hour."""
+    hour = _hotel_now(config).hour
+
+    if 5 <= hour < 12:
+        return "Good morning"
+    if 12 <= hour < 18:
+        return "Good afternoon"
+    return "Good evening"
 
 
 MODULE_META: dict[str, dict[str, str]] = {
@@ -215,13 +262,14 @@ def render(guests: list[dict[str, Any]] | None = None) -> None:
     config = load_client_config(client_code)
     client = config.get("client", {})
     hotel_name = str(client.get("name") or "Property")
+    greeting = _hotel_greeting(config)
 
     st.markdown(
         f"""
         <section class="dashboard-hero">
             <div>
                 <div class="dashboard-eyebrow">EXECUTIVE WORKSPACE</div>
-                <h1>Good day, {escape(hotel_name)}</h1>
+                <h1>{escape(greeting)}, {escape(hotel_name)}</h1>
                 <p>Your active modules and today's operational workload in one place.</p>
             </div>
             <div class="dashboard-property-chip">● Live property</div>
