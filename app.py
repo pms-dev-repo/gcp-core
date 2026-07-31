@@ -14,6 +14,7 @@ from core.config import (
 from modules.communications.page import render as render_communications
 from modules.dashboard.page import render as render_dashboard
 from modules.guest_transportation.page import render as render_guest_transportation
+from modules.flight_center.page import render as render_flight_center
 from modules.confirmation_letters.page import render as render_confirmation_letters
 from modules.registration_cards.guest_form import (
     render_guest_registration_form,
@@ -23,7 +24,6 @@ from modules.shared_placeholder import render_module_placeholder
 from services.guest_service import load_guests
 from utils.state import initialize_state
 from utils.styles import apply_global_styles
-from services.database import get_supabase
 
 registration_token = st.query_params.get("registration_token")
 if registration_token:
@@ -90,6 +90,8 @@ elif active_page == "registration_cards":
     render_registration_cards()
 elif active_page == "guest_transportation":
     render_guest_transportation()
+elif active_page == "flight_center":
+    render_flight_center()
 elif active_page == "administration":
     render_administration()
 elif active_page == "templates":

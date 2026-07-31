@@ -1,11 +1,62 @@
 from __future__ import annotations
 
 from datetime import datetime
+from html import escape
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from core.config import load_client_config
+
+
+def _render_sidebar_toggle_script() -> None:
+    components.html(
+        """
+        <script>
+        (() => {
+            const parentDocument = window.parent.document;
+
+            function installToggle() {
+                const header = parentDocument.querySelector(".gcp-header");
+                const sidebar = parentDocument.querySelector('[data-testid="stSidebar"]');
+
+                if (!header || !sidebar) {
+                    window.setTimeout(installToggle, 80);
+                    return;
+                }
+
+                let button = header.querySelector(".gcp-header-menu-button");
+                if (!button) {
+                    button = parentDocument.createElement("button");
+                    button.type = "button";
+                    button.className = "gcp-header-menu-button";
+                    button.setAttribute("aria-label", "Show or hide navigation");
+                    button.setAttribute("title", "Show or hide navigation");
+                    header.prepend(button);
+                }
+
+                function refreshIcon() {
+                    const collapsed = parentDocument.body.classList.contains("gcp-sidebar-collapsed");
+                    button.textContent = collapsed ? "☰" : "✕";
+                    button.setAttribute("aria-expanded", String(!collapsed));
+                }
+
+                button.onclick = () => {
+                    parentDocument.body.classList.toggle("gcp-sidebar-collapsed");
+                    refreshIcon();
+                };
+
+                refreshIcon();
+            }
+
+            installToggle();
+        })();
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
 
 
 def render_header() -> None:
@@ -13,11 +64,7 @@ def render_header() -> None:
     client = config.get("client", {})
     branding = client.get("branding", {})
 
-    timezone_name = str(
-        client.get("timezone")
-        or config.get("timezone")
-        or "UTC"
-    )
+    timezone_name = str(client.get("timezone") or config.get("timezone") or "UTC")
 
     try:
         local_now = datetime.now(ZoneInfo(timezone_name))
@@ -28,39 +75,11 @@ def render_header() -> None:
     time_text = local_now.strftime("%I:%M %p").lstrip("0")
     timezone_abbr = local_now.tzname() or "UTC"
 
-    product_name = branding.get("product_name", "GCP")
-    product_subtitle = branding.get(
-        "product_subtitle",
-        "Guest Communication Platform",
-    )
-    hotel_name = str(client.get("name", "Hotel")).upper()
-
-    st.session_state.setdefault("sidebar_open", True)
-
-    burger_label = (
-        "✕"
-        if st.session_state.get("sidebar_open", True)
-        else "☰"
-    )
-
-    if st.button(
-        burger_label,
-        key="toggle_sidebar",
-        help="Show or hide navigation",
-    ):
-        st.session_state.sidebar_open = (
-            not st.session_state.sidebar_open
-        )
-        st.rerun()
-
-    state_class = (
-        "gcp-sidebar-open"
-        if st.session_state.sidebar_open
-        else "gcp-sidebar-closed"
-    )
+    product_name = escape(str(branding.get("product_name", "GCP")))
+    product_subtitle = escape(str(branding.get("product_subtitle", "Guest Communication Platform")))
+    hotel_name = escape(str(client.get("name", "Hotel")).upper())
 
     header_html = (
-        f'<span class="{state_class}"></span>'
         '<div class="gcp-header">'
         '<div class="gcp-header-left">'
         f'<div class="gcp-brand">{product_name}</div>'
@@ -69,24 +88,18 @@ def render_header() -> None:
         '</div>'
         '<div class="gcp-header-right">'
         '<div class="gcp-date-time">'
-        f'<div class="gcp-date">{date_text}</div>'
-        f'<div class="gcp-time">'
-        f'{time_text}'
-        f'<span class="gcp-tz">{timezone_abbr}</span>'
-        '</div>'
-        '</div>'
+        f'<div class="gcp-date">{escape(date_text)}</div>'
+        '<div class="gcp-time">'
+        f'{escape(time_text)}'
+        f'<span class="gcp-tz">{escape(timezone_abbr)}</span>'
+        '</div></div>'
         '<div class="gcp-user">'
         '<div class="gcp-avatar">FD</div>'
         '<div class="gcp-user-info">'
         f'<div class="gcp-hotel">{hotel_name}</div>'
         '<div class="gcp-username">FD001</div>'
-        '</div>'
-        '</div>'
-        '</div>'
-        '</div>'
+        '</div></div></div></div>'
     )
 
-    st.markdown(
-        header_html,
-        unsafe_allow_html=True,
-    )
+    st.markdown(header_html, unsafe_allow_html=True)
+    _render_sidebar_toggle_script()
