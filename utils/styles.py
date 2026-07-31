@@ -1598,3 +1598,84 @@ _previous_apply_global_styles = apply_global_styles
 def apply_global_styles() -> None:
     _previous_apply_global_styles()
     _integrated_header_styles()
+
+# Fix header wrapper collapsed by legacy :has(button[title=...]) selectors.
+def _integrated_header_wrapper_fix() -> None:
+    st.markdown(
+        """
+        <style>
+        /* Restore the Streamlit element that contains the complete GCP header. */
+        div[data-testid="stElementContainer"]:has(.gcp-header){
+            position:relative !important;
+            inset:auto !important;
+            width:100% !important;
+            height:auto !important;
+            min-height:46px !important;
+            margin:0 !important;
+            padding:0 !important;
+            overflow:visible !important;
+            z-index:auto !important;
+        }
+
+        div[data-testid="stElementContainer"]:has(.gcp-header)
+        [data-testid="stMarkdownContainer"]{
+            width:100% !important;
+            min-width:0 !important;
+        }
+
+        .gcp-header{
+            display:flex !important;
+            width:100% !important;
+            min-width:0 !important;
+            height:46px !important;
+            min-height:46px !important;
+            margin:0 0 10px !important;
+            padding:0 16px 0 70px !important;
+            box-sizing:border-box !important;
+            background:#30364c !important;
+            color:#ffffff !important;
+            overflow:hidden !important;
+        }
+
+        .gcp-header-left,
+        .gcp-header-right{
+            position:relative !important;
+            display:flex !important;
+            align-items:center !important;
+            min-width:0 !important;
+        }
+
+        .gcp-header-right{
+            margin-left:auto !important;
+        }
+
+        .gcp-header-menu-button{
+            position:absolute !important;
+            top:0 !important;
+            left:0 !important;
+            bottom:0 !important;
+            z-index:10 !important;
+        }
+
+        /* The zero-height JS component must not create a visual row. */
+        div[data-testid="stElementContainer"]:has(
+            iframe[title="streamlit_components.streamlit_components"]
+        ){
+            width:0 !important;
+            height:0 !important;
+            min-height:0 !important;
+            margin:0 !important;
+            padding:0 !important;
+            overflow:hidden !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+_latest_apply_global_styles = apply_global_styles
+
+def apply_global_styles() -> None:
+    _latest_apply_global_styles()
+    _integrated_header_wrapper_fix()
