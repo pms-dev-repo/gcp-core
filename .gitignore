@@ -7,5 +7,7 @@ __pycache__/
 .streamlit/secrets.toml
 .vscode/
 .DS_Store
-generated/*.docx
+# Generated guest documents may live in per-property subdirectories.
+# Keep them local and out of commits because they can contain personal data.
+generated/**
 !generated/.gitkeep
