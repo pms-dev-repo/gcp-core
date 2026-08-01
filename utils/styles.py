@@ -1119,8 +1119,8 @@ button::before{
 .gcp-hotel,.gcp-username{color:#ffffff; font-size:12px; font-weight:600;}
 
 /* Burger floats over the continuous header */
-div[data-testid="stButton"] button[title="Show or hide navigation"],
-div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
+div[data-testid="stButton"] button[title="Show or hide navigation"]:not(.gcp-header-menu-button),
+div[data-testid="stButton"] button[aria-label="Show or hide navigation"]:not(.gcp-header-menu-button){
     position:absolute !important;
     top:8px !important;
     left:16px !important;
@@ -1138,8 +1138,8 @@ div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
     font-size:22px !important;
 }
 
-div[data-testid="stButton"] button[title="Show or hide navigation"]:hover,
-div[data-testid="stButton"] button[aria-label="Show or hide navigation"]:hover{
+div[data-testid="stButton"] button[title="Show or hide navigation"]:not(.gcp-header-menu-button):hover,
+div[data-testid="stButton"] button[aria-label="Show or hide navigation"]:not(.gcp-header-menu-button):hover{
     background:#4a516b !important;
     transform:none !important;
 }
@@ -1316,10 +1316,10 @@ div[data-testid="stDateInput"] input{
 /* The toggle button is absolutely positioned, but its Streamlit wrapper
    otherwise remains in document flow and creates the large blank band. */
 div[data-testid="stElementContainer"]:has(
-    button[title="Show or hide navigation"]
+    button[title="Show or hide navigation"]:not(.gcp-header-menu-button)
 ),
 div[data-testid="stElementContainer"]:has(
-    button[aria-label="Show or hide navigation"]
+    button[aria-label="Show or hide navigation"]:not(.gcp-header-menu-button)
 ){
     position:absolute !important;
     inset:0 auto auto 0 !important;
@@ -1333,8 +1333,8 @@ div[data-testid="stElementContainer"]:has(
 }
 
 /* Align the toggle exactly with the header bar. */
-div[data-testid="stButton"] button[title="Show or hide navigation"],
-div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
+div[data-testid="stButton"] button[title="Show or hide navigation"]:not(.gcp-header-menu-button),
+div[data-testid="stButton"] button[aria-label="Show or hide navigation"]:not(.gcp-header-menu-button){
     top:0 !important;
     left:16px !important;
     width:50px !important;
@@ -1395,8 +1395,8 @@ div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
         padding-right:10px !important;
     }
 
-    div[data-testid="stButton"] button[title="Show or hide navigation"],
-    div[data-testid="stButton"] button[aria-label="Show or hide navigation"]{
+    div[data-testid="stButton"] button[title="Show or hide navigation"]:not(.gcp-header-menu-button),
+    div[data-testid="stButton"] button[aria-label="Show or hide navigation"]:not(.gcp-header-menu-button){
         left:10px !important;
     }
 
@@ -1679,3 +1679,154 @@ _latest_apply_global_styles = apply_global_styles
 def apply_global_styles() -> None:
     _latest_apply_global_styles()
     _integrated_header_wrapper_fix()
+
+
+# Final stabilization for the integrated header.
+def _final_integrated_header_fix() -> None:
+    st.markdown(
+        """
+        <style>
+        [data-testid="stMainBlockContainer"]
+        div[data-testid="stElementContainer"]:has(.gcp-header),
+        [data-testid="stMainBlockContainer"]
+        div[data-testid="stMarkdown"]:has(.gcp-header),
+        [data-testid="stMainBlockContainer"]
+        [data-testid="stMarkdownContainer"]:has(.gcp-header){
+            position:relative !important;
+            inset:auto !important;
+            display:block !important;
+            width:100% !important;
+            max-width:none !important;
+            min-width:0 !important;
+            height:auto !important;
+            min-height:46px !important;
+            margin:0 !important;
+            padding:0 !important;
+            overflow:visible !important;
+            flex:1 1 100% !important;
+            z-index:auto !important;
+        }
+
+        .gcp-header{
+            position:relative !important;
+            display:flex !important;
+            align-items:center !important;
+            justify-content:space-between !important;
+            width:100% !important;
+            max-width:none !important;
+            min-width:0 !important;
+            height:46px !important;
+            min-height:46px !important;
+            padding:0 16px 0 70px !important;
+            margin:0 0 10px !important;
+            box-sizing:border-box !important;
+            background:#30364c !important;
+            color:#ffffff !important;
+            overflow:hidden !important;
+        }
+
+        .gcp-header-left{
+            display:flex !important;
+            align-items:center !important;
+            gap:8px !important;
+            min-width:0 !important;
+            flex:0 1 auto !important;
+        }
+
+        .gcp-header-right{
+            display:flex !important;
+            align-items:center !important;
+            gap:17px !important;
+            min-width:0 !important;
+            margin-left:auto !important;
+            flex:0 0 auto !important;
+        }
+
+        .gcp-header-menu-button{
+            position:absolute !important;
+            top:0 !important;
+            left:0 !important;
+            bottom:0 !important;
+            width:54px !important;
+            min-width:54px !important;
+            height:46px !important;
+            min-height:46px !important;
+            margin:0 !important;
+            padding:0 !important;
+            border:0 !important;
+            border-right:1px solid rgba(255,255,255,.16) !important;
+            border-radius:0 !important;
+            background:#3c425a !important;
+            color:#ffffff !important;
+            box-shadow:none !important;
+            transform:none !important;
+            z-index:20 !important;
+        }
+
+        .gcp-header-menu-button:hover{
+            background:#4a516b !important;
+            color:#ffffff !important;
+            transform:none !important;
+        }
+
+        [data-testid="stElementContainer"]:has(
+            iframe[title="streamlit_components.streamlit_components"]
+        ){
+            position:absolute !important;
+            width:0 !important;
+            height:0 !important;
+            min-width:0 !important;
+            min-height:0 !important;
+            margin:0 !important;
+            padding:0 !important;
+            overflow:hidden !important;
+            pointer-events:none !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+_final_previous_apply_global_styles = apply_global_styles
+
+def apply_global_styles() -> None:
+    _final_previous_apply_global_styles()
+    _final_integrated_header_fix()
+
+
+# Keep the header full-width even when Streamlit gives its Markdown wrapper a
+# content-sized width.  The sidebar is 250px wide; the main canvas has 16px of
+# padding on each side.
+def _header_width_guard() -> None:
+    st.markdown(
+        """
+        <style>
+        .gcp-header{
+            width:calc(100vw - 282px) !important;
+            max-width:calc(100vw - 282px) !important;
+        }
+
+        body.gcp-sidebar-collapsed .gcp-header{
+            width:calc(100vw - 32px) !important;
+            max-width:calc(100vw - 32px) !important;
+        }
+
+        @media(max-width:900px){
+            .gcp-header,
+            body.gcp-sidebar-collapsed .gcp-header{
+                width:calc(100vw - 20px) !important;
+                max-width:calc(100vw - 20px) !important;
+            }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+_width_guard_previous_apply_global_styles = apply_global_styles
+
+def apply_global_styles() -> None:
+    _width_guard_previous_apply_global_styles()
+    _header_width_guard()
