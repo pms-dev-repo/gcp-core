@@ -7,6 +7,7 @@ from unittest.mock import patch
 with patch.dict("sys.modules", {"streamlit": object()}):
     from modules.guest_sms.page import (
         OPT_OUT_FOOTER,
+        _available_dates,
         _demo_phone,
         _matches_segment,
         _personalize,
@@ -26,9 +27,21 @@ class GuestSmsDemoTests(unittest.TestCase):
         }
 
     def test_segments_arrival_and_in_house(self) -> None:
-        self.assertTrue(_matches_segment(self.guest, "Arrivals", date(2026, 8, 2)))
+        self.assertTrue(_matches_segment(self.guest, "Arrivals", date(2026, 8, 1)))
+        self.assertFalse(_matches_segment(self.guest, "Arrivals", date(2026, 8, 2)))
         self.assertTrue(_matches_segment(self.guest, "In House", date(2026, 8, 2)))
         self.assertFalse(_matches_segment(self.guest, "Departures", date(2026, 8, 2)))
+
+    def test_available_dates_are_unique_and_sorted(self) -> None:
+        later_guest = {
+            **self.guest,
+            "id": "guest-102",
+            "stay": {**self.guest["stay"], "arrival_date": "Aug 03, 2026"},
+        }
+        self.assertEqual(
+            _available_dates([later_guest, self.guest, self.guest], "Arrivals"),
+            [date(2026, 8, 1), date(2026, 8, 3)],
+        )
 
     def test_personalization_always_includes_opt_out(self) -> None:
         message = _personalize(

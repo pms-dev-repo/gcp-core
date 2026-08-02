@@ -32,19 +32,62 @@ def _parse_date(value: Any) -> date | None:
     return None
 
 
-def _matches_segment(guest: dict[str, Any], segment: str, today: date) -> bool:
+def _matches_segment(guest: dict[str, Any], segment: str, selected_date: date) -> bool:
     movement = _normalize(guest.get("movement"))
     reservation_status = _normalize(guest.get("reservation_status"))
-    if segment == "Arrivals":
-        return movement in {"arrival", "arrivals"}
-    if segment == "Departures":
-        return movement in {"departure", "departures"}
-    if reservation_status in {"in_house", "checked_in", "occupied"}:
-        return True
     stay = guest.get("stay") or {}
     arrival = _parse_date(stay.get("arrival_date"))
     departure = _parse_date(stay.get("departure_date"))
-    return bool(arrival and departure and arrival <= today < departure)
+    if segment == "Arrivals":
+        return movement in {"arrival", "arrivals"} and arrival == selected_date
+    if segment == "Departures":
+        return movement in {"departure", "departures"} and departure == selected_date
+    if arrival and departure:
+        return arrival <= selected_date < departure
+    return reservation_status in {"in_house", "checked_in", "occupied"}
+
+
+def _available_dates(guests: list[dict[str, Any]], segment: str) -> list[date]:
+    field = "arrival_date" if segment == "Arrivals" else "departure_date"
+    movement_names = (
+        {"arrival", "arrivals"}
+        if segment == "Arrivals"
+        else {"departure", "departures"}
+    )
+    dates = {
+        parsed
+        for guest in guests
+        if _normalize(guest.get("movement")) in movement_names
+        if (parsed := _parse_date((guest.get("stay") or {}).get(field))) is not None
+    }
+    return sorted(dates)
+
+
+def _date_filter(guests: list[dict[str, Any]], segment: str) -> date:
+    if segment == "In House":
+        return st.date_input(
+            "In-house as of",
+            value=date.today(),
+            key="sms_filter_in_house",
+            help="Shows guests whose stay includes the selected date.",
+        )
+
+    available = _available_dates(guests, segment)
+    label = "Arrival date" if segment == "Arrivals" else "Departure date"
+    if not available:
+        return st.date_input(label, value=date.today(), key=f"sms_filter_{segment.lower()}")
+
+    today = date.today()
+    default_index = min(
+        range(len(available)), key=lambda index: abs(available[index] - today)
+    )
+    return st.selectbox(
+        label,
+        options=available,
+        index=default_index,
+        format_func=lambda value: value.strftime("%d %b %Y"),
+        key=f"sms_filter_{segment.lower()}",
+    )
 
 
 def _demo_phone(guest: dict[str, Any]) -> str:
@@ -148,7 +191,8 @@ def render(guests: list[dict[str, Any]]) -> None:
     )
 
     segment = st.segmented_control("Reservation segment", SEGMENTS, default="Arrivals", key="sms_segment") or "Arrivals"
-    matching = [guest for guest in guests if _matches_segment(guest, segment, date.today())]
+    selected_date = _date_filter(guests, segment)
+    matching = [guest for guest in guests if _matches_segment(guest, segment, selected_date)]
     opt_out_ids: set[str] = st.session_state.sms_opt_out_ids
     eligible, missing = [], 0
     for guest in matching:

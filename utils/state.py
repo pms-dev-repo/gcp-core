@@ -159,6 +159,9 @@ def reset_client_state() -> None:
         "sms_demo_history",
         "sms_segment",
         "sms_consent_guest",
+        "sms_filter_arrivals",
+        "sms_filter_departures",
+        "sms_filter_in_house",
     )
 
     for key in keys_to_reset:
