@@ -155,6 +155,10 @@ def reset_client_state() -> None:
         "transport_direction_filter",
         "transport_status_filter",
         "transport_search",
+        "sms_opt_out_ids",
+        "sms_demo_history",
+        "sms_segment",
+        "sms_consent_guest",
     )
 
     for key in keys_to_reset:

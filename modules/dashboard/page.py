@@ -62,6 +62,11 @@ MODULE_META: dict[str, dict[str, str]] = {
         "title": "Guest Communications",
         "description": "Arrival and departure communications",
     },
+    "guest_sms": {
+        "icon": "💬",
+        "title": "Guest SMS",
+        "description": "Reservation-based text message campaigns",
+    },
     "confirmation_letters": {
         "icon": "✓",
         "title": "Confirmation Letters",
@@ -181,6 +186,27 @@ def _communication_metrics(guests: list[dict[str, Any]]) -> list[tuple[str, int,
     return [("Arrivals", arrivals, "arrival"), ("Departures", departures, "departure"), ("Sent", sent, "sent"), ("Missing email", missing_email, "warning")]
 
 
+def _sms_metrics(guests: list[dict[str, Any]]) -> list[tuple[str, int, str]]:
+    movements = Counter(_movement(guest) for guest in guests)
+    arrivals = sum(movements[key] for key in ("arrival", "arrivals"))
+    departures = sum(movements[key] for key in ("departure", "departures"))
+    in_house = sum(
+        1
+        for guest in guests
+        if _normalize(guest.get("reservation_status"))
+        in {"in_house", "checked_in", "occupied"}
+    )
+    with_mobile = sum(
+        1 for guest in guests if guest.get("phone") or guest.get("mobile")
+    )
+    return [
+        ("Arrivals", arrivals, "arrival"),
+        ("Departures", departures, "departure"),
+        ("In House", in_house, "generated"),
+        ("With mobile", with_mobile, "sent"),
+    ]
+
+
 def _transportation_metrics(guests: list[dict[str, Any]]) -> list[tuple[str, int, str]]:
     transfers = [
         guest
@@ -286,6 +312,8 @@ def render(guests: list[dict[str, Any]] | None = None) -> None:
     operational: list[tuple[str, list[tuple[str, int, str]]]] = []
     if module_enabled("communications", config):
         operational.append(("communications", _communication_metrics(guests)))
+    if module_enabled("guest_sms", config):
+        operational.append(("guest_sms", _sms_metrics(guests)))
     if module_enabled("confirmation_letters", config):
         operational.append(("confirmation_letters", _confirmation_metrics(guests)))
     if module_enabled("registration_cards", config):

@@ -14,6 +14,7 @@ from core.config import (
 from modules.communications.page import render as render_communications
 from modules.dashboard.page import render as render_dashboard
 from modules.guest_transportation.page import render as render_guest_transportation
+from modules.guest_sms.page import render as render_guest_sms
 from modules.flight_center.page import render as render_flight_center
 from modules.confirmation_letters.page import render as render_confirmation_letters
 from modules.registration_cards.guest_form import (
@@ -84,6 +85,8 @@ if active_page == "dashboard":
     render_dashboard(guests)
 elif active_page == "communications":
     render_communications(guests)
+elif active_page == "guest_sms":
+    render_guest_sms(guests)
 elif active_page == "confirmation_letters":
     render_confirmation_letters()
 elif active_page == "registration_cards":

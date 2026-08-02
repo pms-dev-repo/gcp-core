@@ -30,6 +30,7 @@
   "modules": {
     "dashboard": true,
     "communications": true,
+    "guest_sms": true,
     "confirmation_letters": true,
     "registration_cards": true,
     "history": true,
@@ -39,6 +40,10 @@
     "about": true,
     "guest_transportation": true,
     "flight_center": true
+  },
+  "guest_sms": {
+    "sender_name": "GCP Hotel",
+    "allow_demo_numbers": true
   },
   "document_types": {
     "arrival_letter": true,

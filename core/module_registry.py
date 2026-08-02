@@ -24,6 +24,13 @@ MODULES = (
         parent="Guest Communications",
     ),
     ModuleDefinition(
+        "guest_sms",
+        "Guest SMS",
+        "💬",
+        "guest_documents",
+        parent="Guest Communications",
+    ),
+    ModuleDefinition(
         "confirmation_letters",
         "Confirmation Letters",
         "✉",

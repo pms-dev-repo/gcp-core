@@ -21,6 +21,7 @@
   "modules": {
     "dashboard": true,
     "communications": true,
+    "guest_sms": true,
     "confirmation_letters": false,
     "registration_cards": false,
     "history": false,
@@ -28,6 +29,10 @@
     "administration": true,
     "settings": false,
     "about": true
+  },
+  "guest_sms": {
+    "sender_name": "Sandy Lane",
+    "allow_demo_numbers": true
   },
   "document_types": {
     "arrival_letter": true,
