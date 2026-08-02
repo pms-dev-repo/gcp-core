@@ -1819,6 +1819,26 @@ def _header_width_guard() -> None:
                 max-width:calc(100vw - 20px) !important;
             }
         }
+
+        /* Sidebar alignment: Streamlit centers the Markdown node inside its
+           buttons unless the inner wrapper is explicitly stretched. */
+        [data-testid="stSidebar"] div[data-testid="stButton"] button
+        [data-testid="stMarkdownContainer"]{
+            width:100% !important;
+            min-width:0 !important;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stButton"] button p{
+            width:100% !important;
+            margin:0 !important;
+            text-align:left !important;
+            white-space:nowrap !important;
+        }
+
+        [data-testid="stSidebar"] .gcp-guest-letters-parent{
+            padding-left:14px !important;
+            padding-right:14px !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
