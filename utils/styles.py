@@ -1909,6 +1909,15 @@ def _reference_header_styles() -> None:
             letter-spacing:.5px !important;
         }
 
+        .gcp-brand-logo{
+            display:block !important;
+            width:72px !important;
+            height:auto !important;
+            flex:0 0 auto !important;
+            object-fit:contain !important;
+            filter:brightness(0) invert(1) !important;
+        }
+
         .gcp-divider{
             height:28px !important;
             background:rgba(255,255,255,.32) !important;
@@ -2017,6 +2026,7 @@ def _reference_header_styles() -> None:
             }
 
             .gcp-brand{font-size:25px !important;}
+            .gcp-brand-logo{width:62px !important;}
             .gcp-date{font-size:12px !important;}
             .gcp-avatar{width:38px !important;height:38px !important;}
         }

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from base64 import b64encode
 from datetime import datetime
 from html import escape
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -7,7 +8,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import streamlit as st
 import streamlit.components.v1 as components
 
-from core.config import load_client_config
+from core.config import BASE_DIR, load_client_config
 
 
 def _render_sidebar_toggle_script() -> None:
@@ -79,10 +80,21 @@ def render_header() -> None:
     product_subtitle = escape(str(branding.get("product_subtitle", "Guest Communication Platform")))
     hotel_name = escape(str(client.get("name", "Hotel")).upper())
 
+    logo_path = BASE_DIR / "assets" / "gcp_logo_vector.svg"
+    try:
+        logo_data = b64encode(logo_path.read_bytes()).decode("ascii")
+        brand_html = (
+            '<img class="gcp-brand-logo" '
+            f'src="data:image/svg+xml;base64,{logo_data}" '
+            f'alt="{product_name}" />'
+        )
+    except OSError:
+        brand_html = f'<div class="gcp-brand">{product_name}</div>'
+
     header_html = (
         '<div class="gcp-header">'
         '<div class="gcp-header-left">'
-        f'<div class="gcp-brand">{product_name}</div>'
+        f'{brand_html}'
         '<div class="gcp-divider"></div>'
         f'<div class="gcp-product-name">{product_subtitle}</div>'
         '</div>'
