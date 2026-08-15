@@ -546,8 +546,12 @@ def render() -> None:
     config = load_client_config(client_code)
     client = config.get("client", {})
     hotel_name = str(client.get("name") or "Property")
+    transportation_config = config.get("guest_transportation", {}) or {}
+    data_client_code = str(
+        transportation_config.get("data_client_code") or client_code
+    )
     try:
-        transport_guests = load_transportation_guests(client_code)
+        transport_guests = load_transportation_guests(data_client_code)
     except DatabaseConfigurationError as exc:
         st.error(f"Supabase is not configured: {exc}")
         return
@@ -560,17 +564,17 @@ def render() -> None:
         f"Daily transfer planning and operational control · {hotel_name} · Live Supabase data"
     )
 
-    _render_metrics(transport_guests, client_code)
+    _render_metrics(transport_guests, data_client_code)
 
     st.markdown("---")
     selected_date, direction_filter, status_filter, search = _render_filters(
         transport_guests,
-        client_code,
+        data_client_code,
     )
 
     filtered = _filtered_guests(
         transport_guests,
-        client_code,
+        data_client_code,
         selected_date,
         direction_filter,
         status_filter,
@@ -591,7 +595,7 @@ def render() -> None:
 
     with list_col:
         st.markdown("### Transfers")
-        _render_transfer_list(filtered, client_code)
+        _render_transfer_list(filtered, data_client_code)
 
     with detail_col:
         selected_guest_id = str(
@@ -607,9 +611,9 @@ def render() -> None:
         )
 
         if selected_guest:
-            _render_transfer_editor(selected_guest, client_code)
+            _render_transfer_editor(selected_guest, data_client_code)
         else:
             st.info("Select a transfer to manage its operational details.")
 
     st.markdown("---")
-    _render_operational_table(filtered, client_code)
+    _render_operational_table(filtered, data_client_code)

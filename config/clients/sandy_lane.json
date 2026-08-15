@@ -24,11 +24,15 @@
     "guest_sms": true,
     "confirmation_letters": false,
     "registration_cards": false,
+    "guest_transportation": true,
     "history": false,
     "templates": true,
     "administration": true,
     "settings": false,
     "about": true
+  },
+  "guest_transportation": {
+    "data_client_code": "GCPHOTEL"
   },
   "guest_sms": {
     "sender_name": "Sandy Lane",
