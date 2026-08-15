@@ -2031,3 +2031,93 @@ _reference_header_previous_apply_global_styles = apply_global_styles
 def apply_global_styles() -> None:
     _reference_header_previous_apply_global_styles()
     _reference_header_styles()
+
+
+# One shared navy palette for every primary application surface.  Content
+# cards remain white so tables, forms and operational metrics stay readable.
+def _unified_navy_theme_styles() -> None:
+    st.markdown(
+        """
+        <style>
+        .stApp{
+            --gcp-navy:#101c37;
+            --gcp-navy-mid:#17233e;
+            --gcp-navy-hover:#1d2c4c;
+            --gcp-navy-active:#263858;
+            --gcp-primary:var(--gcp-navy);
+            --gcp-primary-hover:var(--gcp-navy-hover);
+            --gcp-primary-active:#0b1429;
+        }
+
+        .gcp-header,
+        [data-testid="stSidebar"],
+        [data-testid="stSidebar"] > div:first-child,
+        [data-testid="stSidebarContent"]{
+            background:linear-gradient(145deg,var(--gcp-navy) 0%,var(--gcp-navy-mid) 100%) !important;
+        }
+
+        [data-testid="stSidebar"]{
+            border-right:1px solid rgba(5,12,28,.42) !important;
+            box-shadow:5px 0 18px rgba(16,28,55,.08) !important;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stButton"] button{
+            background:transparent !important;
+        }
+
+        [data-testid="stSidebar"] div[data-testid="stButton"] button:hover{
+            background:var(--gcp-navy-hover) !important;
+        }
+
+        [data-testid="stSidebar"]
+        div[data-testid="stElementContainer"]:has(.sidebar-nav-marker.active)
+        + div[data-testid="stElementContainer"] button{
+            background:var(--gcp-navy-active) !important;
+            box-shadow:inset 4px 0 0 #f2cf62 !important;
+        }
+
+        .dashboard-hero{
+            background:linear-gradient(135deg,var(--gcp-navy),var(--gcp-navy-mid)) !important;
+            box-shadow:0 10px 28px rgba(16,28,55,.18) !important;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-card-marker) button,
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-quick-marker) button,
+        div[data-testid="stButton"] button[kind="primary"],
+        div[data-testid="stFormSubmitButton"] button,
+        div[data-testid="stDownloadButton"] button[kind="primary"]{
+            background:var(--gcp-navy) !important;
+            border-color:var(--gcp-navy) !important;
+            color:#ffffff !important;
+            box-shadow:0 2px 6px rgba(16,28,55,.14) !important;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-card-marker) button:hover,
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.dashboard-quick-marker) button:hover,
+        div[data-testid="stButton"] button[kind="primary"]:hover,
+        div[data-testid="stFormSubmitButton"] button:hover,
+        div[data-testid="stDownloadButton"] button[kind="primary"]:hover{
+            background:var(--gcp-navy-hover) !important;
+            border-color:var(--gcp-navy-hover) !important;
+            color:#ffffff !important;
+            transform:none !important;
+        }
+
+        [data-baseweb="tab-list"] [aria-selected="true"]{
+            color:var(--gcp-navy) !important;
+        }
+
+        [data-baseweb="tab-highlight"]{
+            background-color:var(--gcp-navy) !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+_unified_navy_previous_apply_global_styles = apply_global_styles
+
+def apply_global_styles() -> None:
+    _unified_navy_previous_apply_global_styles()
+    _unified_navy_theme_styles()
