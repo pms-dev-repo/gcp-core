@@ -198,6 +198,7 @@ def _matches(
 def _render_metrics(
     guests: list[dict[str, Any]],
     client_code: str,
+    direction: str = "All",
 ) -> None:
     records = [_record_for_guest(client_code, guest) for guest in guests]
 
@@ -232,45 +233,70 @@ def _render_metrics(
     )
 
     columns = st.columns(6)
-    metrics = (
-        ("Transfers", total),
-        ("Pickups", pickups),
-        ("Drop-offs", dropoffs),
-        ("Pending", pending),
-        ("Confirmed", confirmed),
-        ("Completed", completed),
-    )
+    passengers = sum(_pax(guest) for guest in guests)
+    if direction == "Arrival":
+        metrics = (
+            ("Arrivals", total),
+            ("Pickups", pickups),
+            ("Passengers", passengers),
+            ("Pending", pending),
+            ("Confirmed", confirmed),
+            ("Completed", completed),
+        )
+    elif direction == "Departure":
+        metrics = (
+            ("Departures", total),
+            ("Drop-offs", dropoffs),
+            ("Passengers", passengers),
+            ("Pending", pending),
+            ("Confirmed", confirmed),
+            ("Completed", completed),
+        )
+    else:
+        metrics = (
+            ("Transfers", total),
+            ("Pickups", pickups),
+            ("Drop-offs", dropoffs),
+            ("Pending", pending),
+            ("Confirmed", confirmed),
+            ("Completed", completed),
+        )
     for column, (label, value) in zip(columns, metrics):
         column.metric(label, value)
 
 
 def _render_filters(
-    guests: list[dict[str, Any]],
-    client_code: str,
+    key_prefix: str,
+    direction: str = "All",
 ) -> tuple[date | None, str, str, str]:
-    row1 = st.columns([1.1, 1, 1, 1.7])
+    include_direction = direction == "All"
+    row1 = st.columns([1.1, 1, 1, 1.7] if include_direction else [1.1, 1, 1.7])
     selected_date = row1[0].date_input(
         "Business date",
         value=st.session_state.get(
-            "transport_business_date",
+            f"transport_{key_prefix}_business_date",
             date.today(),
         ),
-        key="transport_business_date",
+        key=f"transport_{key_prefix}_business_date",
     )
-    direction_filter = row1[1].selectbox(
-        "Direction",
-        ("All", "Arrival", "Departure"),
-        key="transport_direction_filter",
-    )
-    status_filter = row1[2].selectbox(
+    status_column = 2 if include_direction else 1
+    search_column = 3 if include_direction else 2
+    direction_filter = direction
+    if include_direction:
+        direction_filter = row1[1].selectbox(
+            "Direction",
+            ("All", "Arrival", "Departure"),
+            key=f"transport_{key_prefix}_direction_filter",
+        )
+    status_filter = row1[status_column].selectbox(
         "Status",
         ("All",) + TRANSFER_STATUSES,
-        key="transport_status_filter",
+        key=f"transport_{key_prefix}_status_filter",
     )
-    search = row1[3].text_input(
+    search = row1[search_column].text_input(
         "Search",
         placeholder="Guest, room, flight, driver or vehicle",
-        key="transport_search",
+        key=f"transport_{key_prefix}_search",
     )
 
     return selected_date, direction_filter, status_filter, search
@@ -312,6 +338,8 @@ def _filtered_guests(
 def _render_transfer_list(
     guests: list[dict[str, Any]],
     client_code: str,
+    selection_state_key: str,
+    widget_prefix: str,
 ) -> None:
     if not guests:
         st.info("No transportation records match the current filters.")
@@ -322,7 +350,7 @@ def _render_transfer_list(
             guest_id = str(guest.get("id"))
             record = _record_for_guest(client_code, guest)
             selected = (
-                str(st.session_state.get("transport_selected_guest_id") or "")
+                str(st.session_state.get(selection_state_key) or "")
                 == guest_id
             )
 
@@ -346,12 +374,12 @@ def _render_transfer_list(
 
                 if st.button(
                     "Selected" if selected else "Manage transfer",
-                    key=f"transport_open_{guest_id}",
+                    key=f"transport_{widget_prefix}_open_{guest_id}",
                     type="primary" if selected else "secondary",
                     disabled=selected,
                     use_container_width=True,
                 ):
-                    st.session_state.transport_selected_guest_id = guest_id
+                    st.session_state[selection_state_key] = guest_id
                     st.rerun()
 
 
@@ -410,8 +438,13 @@ def _render_transfer_editor(
         )
 
         row2 = st.columns(2)
+        time_label = (
+            "Expected hotel arrival"
+            if _direction(guest) == "Arrival"
+            else "Hotel pickup time"
+        )
         pickup_time = row2[0].text_input(
-            "Pickup / expected time",
+            time_label,
             value=str(record.get("pickup_time") or ""),
             placeholder="10:30 AM",
         )
@@ -531,6 +564,89 @@ def _render_operational_table(
     )
 
 
+def _render_direction_workflow(
+    guests: list[dict[str, Any]],
+    client_code: str,
+    direction: str,
+) -> None:
+    direction_guests = [
+        guest for guest in guests if _direction(guest) == direction
+    ]
+    key_prefix = direction.casefold()
+    selection_state_key = f"transport_{key_prefix}_selected_guest_id"
+
+    _render_metrics(direction_guests, client_code, direction)
+    st.markdown("---")
+    selected_date, direction_filter, status_filter, search = _render_filters(
+        key_prefix,
+        direction,
+    )
+    filtered = _filtered_guests(
+        direction_guests,
+        client_code,
+        selected_date,
+        direction_filter,
+        status_filter,
+        search,
+    )
+
+    if filtered:
+        selected_id = str(st.session_state.get(selection_state_key) or "")
+        available_ids = {str(guest.get("id")) for guest in filtered}
+        if selected_id not in available_ids:
+            st.session_state[selection_state_key] = str(filtered[0].get("id"))
+
+    list_col, detail_col = st.columns([0.39, 0.61], gap="large")
+    with list_col:
+        st.markdown(f"### {direction} transfers")
+        _render_transfer_list(
+            filtered,
+            client_code,
+            selection_state_key,
+            key_prefix,
+        )
+
+    with detail_col:
+        selected_guest_id = str(
+            st.session_state.get(selection_state_key) or ""
+        )
+        selected_guest = next(
+            (
+                guest
+                for guest in filtered
+                if str(guest.get("id")) == selected_guest_id
+            ),
+            None,
+        )
+        if selected_guest:
+            _render_transfer_editor(selected_guest, client_code)
+        else:
+            article = "an" if direction == "Arrival" else "a"
+            st.info(
+                f"Select {article} {direction.casefold()} transfer to manage it."
+            )
+
+
+def _render_operational_board(
+    guests: list[dict[str, Any]],
+    client_code: str,
+) -> None:
+    _render_metrics(guests, client_code)
+    st.markdown("---")
+    selected_date, direction_filter, status_filter, search = _render_filters(
+        "board"
+    )
+    filtered = _filtered_guests(
+        guests,
+        client_code,
+        selected_date,
+        direction_filter,
+        status_filter,
+        search,
+    )
+    _render_operational_table(filtered, client_code)
+
+
 def render() -> None:
     client_code = get_active_client_code()
     config = load_client_config(client_code)
@@ -540,6 +656,7 @@ def render() -> None:
     data_client_code = str(
         transportation_config.get("data_client_code") or client_code
     )
+
     try:
         transport_guests = load_transportation_guests(data_client_code)
     except DatabaseConfigurationError as exc:
@@ -554,56 +671,20 @@ def render() -> None:
         f"Daily transfer planning and operational control · {hotel_name} · Live Supabase data"
     )
 
-    _render_metrics(transport_guests, data_client_code)
-
-    st.markdown("---")
-    selected_date, direction_filter, status_filter, search = _render_filters(
-        transport_guests,
-        data_client_code,
+    arrivals_tab, departures_tab, board_tab = st.tabs(
+        ["Arrivals", "Departures", "Operational Board"]
     )
-
-    filtered = _filtered_guests(
-        transport_guests,
-        data_client_code,
-        selected_date,
-        direction_filter,
-        status_filter,
-        search,
-    )
-
-    if filtered:
-        selected_id = str(
-            st.session_state.get("transport_selected_guest_id") or ""
+    with arrivals_tab:
+        _render_direction_workflow(
+            transport_guests,
+            data_client_code,
+            "Arrival",
         )
-        available_ids = {str(guest.get("id")) for guest in filtered}
-        if selected_id not in available_ids:
-            st.session_state.transport_selected_guest_id = str(
-                filtered[0].get("id")
-            )
-
-    list_col, detail_col = st.columns([0.39, 0.61], gap="large")
-
-    with list_col:
-        st.markdown("### Transfers")
-        _render_transfer_list(filtered, data_client_code)
-
-    with detail_col:
-        selected_guest_id = str(
-            st.session_state.get("transport_selected_guest_id") or ""
+    with departures_tab:
+        _render_direction_workflow(
+            transport_guests,
+            data_client_code,
+            "Departure",
         )
-        selected_guest = next(
-            (
-                guest
-                for guest in filtered
-                if str(guest.get("id")) == selected_guest_id
-            ),
-            None,
-        )
-
-        if selected_guest:
-            _render_transfer_editor(selected_guest, data_client_code)
-        else:
-            st.info("Select a transfer to manage its operational details.")
-
-    st.markdown("---")
-    _render_operational_table(filtered, data_client_code)
+    with board_tab:
+        _render_operational_board(transport_guests, data_client_code)
