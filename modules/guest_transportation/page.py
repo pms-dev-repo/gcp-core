@@ -248,24 +248,14 @@ def _render_filters(
     guests: list[dict[str, Any]],
     client_code: str,
 ) -> tuple[date | None, str, str, str]:
-    available_dates = sorted(
-        {
-            movement_date
-            for guest in guests
-            if (movement_date := _movement_date(guest)) is not None
-        }
-    )
-
-    default_date = available_dates[0] if available_dates else date.today()
-
     row1 = st.columns([1.1, 1, 1, 1.7])
     selected_date = row1[0].date_input(
-        "Operational date",
+        "Business date",
         value=st.session_state.get(
-            "transport_selected_date",
-            default_date,
+            "transport_business_date",
+            date.today(),
         ),
-        key="transport_selected_date",
+        key="transport_business_date",
     )
     direction_filter = row1[1].selectbox(
         "Direction",
