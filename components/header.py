@@ -38,7 +38,7 @@ def _render_sidebar_toggle_script() -> None:
 
                 function refreshIcon() {
                     const collapsed = parentDocument.body.classList.contains("gcp-sidebar-collapsed");
-                    button.textContent = collapsed ? "☰" : "✕";
+                    button.textContent = "☰";
                     button.setAttribute("aria-expanded", String(!collapsed));
                 }
 

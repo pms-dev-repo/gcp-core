@@ -1850,3 +1850,168 @@ _width_guard_previous_apply_global_styles = apply_global_styles
 def apply_global_styles() -> None:
     _width_guard_previous_apply_global_styles()
     _header_width_guard()
+
+
+# Reference-aligned top bar: full-bleed against the main canvas, with a calm
+# navy surface and enough height for the property context to remain legible.
+def _reference_header_styles() -> None:
+    st.markdown(
+        """
+        <style>
+        [data-testid="stMainBlockContainer"]
+        div[data-testid="stElementContainer"]:has(.gcp-header),
+        [data-testid="stMainBlockContainer"]
+        div[data-testid="stMarkdown"]:has(.gcp-header),
+        [data-testid="stMainBlockContainer"]
+        [data-testid="stMarkdownContainer"]:has(.gcp-header){
+            min-height:72px !important;
+        }
+
+        .gcp-header{
+            height:72px !important;
+            min-height:72px !important;
+            width:calc(100vw - 250px) !important;
+            max-width:calc(100vw - 250px) !important;
+            margin:0 0 20px -16px !important;
+            padding:0 28px 0 90px !important;
+            background:linear-gradient(105deg,#101c37 0%,#17233e 100%) !important;
+            box-shadow:0 1px 0 rgba(5,12,28,.28) !important;
+        }
+
+        body.gcp-sidebar-collapsed .gcp-header{
+            width:100vw !important;
+            max-width:100vw !important;
+        }
+
+        .gcp-header-left{
+            gap:10px !important;
+        }
+
+        .gcp-brand{
+            font-size:30px !important;
+            font-weight:750 !important;
+            letter-spacing:.5px !important;
+        }
+
+        .gcp-divider{
+            height:28px !important;
+            background:rgba(255,255,255,.32) !important;
+        }
+
+        .gcp-product-name{
+            font-size:16px !important;
+            font-weight:600 !important;
+        }
+
+        .gcp-header-right{
+            gap:24px !important;
+        }
+
+        .gcp-date-time{
+            line-height:1.2 !important;
+        }
+
+        .gcp-date{
+            font-size:14px !important;
+            font-weight:700 !important;
+        }
+
+        .gcp-time{
+            margin-top:4px !important;
+            font-size:14px !important;
+            color:#f4f6fb !important;
+        }
+
+        .gcp-tz{
+            margin-left:7px !important;
+            padding:2px 7px !important;
+            border-radius:999px !important;
+            background:rgba(242,207,98,.13) !important;
+            color:#f2cf62 !important;
+            font-size:10px !important;
+        }
+
+        .gcp-user{
+            gap:12px !important;
+        }
+
+        .gcp-avatar{
+            width:44px !important;
+            height:44px !important;
+            border-radius:8px !important;
+            background:linear-gradient(145deg,#687493,#4a5574) !important;
+            font-size:13px !important;
+            font-weight:700 !important;
+        }
+
+        .gcp-user-info{
+            line-height:1.35 !important;
+        }
+
+        .gcp-hotel,
+        .gcp-username{
+            font-size:13px !important;
+            font-weight:700 !important;
+        }
+
+        .gcp-header-menu-button{
+            top:0 !important;
+            left:0 !important;
+            bottom:0 !important;
+            width:62px !important;
+            min-width:62px !important;
+            height:72px !important;
+            min-height:72px !important;
+            border:0 !important;
+            background:transparent !important;
+            font-size:25px !important;
+            font-weight:400 !important;
+        }
+
+        .gcp-header-menu-button:hover{
+            background:rgba(255,255,255,.08) !important;
+        }
+
+        @media(max-width:900px){
+            [data-testid="stMainBlockContainer"]
+            div[data-testid="stElementContainer"]:has(.gcp-header),
+            [data-testid="stMainBlockContainer"]
+            div[data-testid="stMarkdown"]:has(.gcp-header),
+            [data-testid="stMainBlockContainer"]
+            [data-testid="stMarkdownContainer"]:has(.gcp-header){
+                min-height:60px !important;
+            }
+
+            .gcp-header,
+            body.gcp-sidebar-collapsed .gcp-header{
+                height:60px !important;
+                min-height:60px !important;
+                width:100vw !important;
+                max-width:100vw !important;
+                margin-left:-10px !important;
+                margin-bottom:12px !important;
+                padding:0 14px 0 66px !important;
+            }
+
+            .gcp-header-menu-button{
+                width:56px !important;
+                min-width:56px !important;
+                height:60px !important;
+                min-height:60px !important;
+            }
+
+            .gcp-brand{font-size:25px !important;}
+            .gcp-date{font-size:12px !important;}
+            .gcp-avatar{width:38px !important;height:38px !important;}
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+_reference_header_previous_apply_global_styles = apply_global_styles
+
+def apply_global_styles() -> None:
+    _reference_header_previous_apply_global_styles()
+    _reference_header_styles()
