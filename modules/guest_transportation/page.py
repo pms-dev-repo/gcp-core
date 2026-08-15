@@ -6,7 +6,11 @@ from typing import Any
 import streamlit as st
 
 from core.config import get_active_client_code, load_client_config
-from services.guest_service import load_guests
+from services.database import DatabaseConfigurationError
+from services.guest_transportation_service import (
+    load_transportation_guests,
+    save_transportation_assignment,
+)
 
 
 TRANSFER_STATUSES = (
@@ -90,14 +94,14 @@ def _default_record(guest: dict[str, Any]) -> dict[str, Any]:
         raw_type if raw_type else "None",
     )
 
-    return {
+    record = {
         "guest_id": str(guest.get("id")),
         "status": "Pending" if normalized_type != "None" else "Pending",
         "transfer_type": normalized_type,
         "pickup_time": str(transport.get("eta") or ""),
         "flight": str(transport.get("flight") or ""),
-        "pickup_location": "",
-        "destination": "",
+        "pickup_location": str(transport.get("pickup_location") or ""),
+        "destination": str(transport.get("destination") or ""),
         "vehicle_type": "Not assigned",
         "vehicle": "",
         "driver": "",
@@ -105,6 +109,11 @@ def _default_record(guest: dict[str, Any]) -> dict[str, Any]:
         "notes": "",
         "updated_at": None,
     }
+    assignment = guest.get("transport_assignment", {}) or {}
+    for key in record:
+        if key in assignment and assignment[key] is not None:
+            record[key] = assignment[key]
+    return record
 
 
 def _store_key(client_code: str) -> str:
@@ -132,14 +141,17 @@ def _record_for_guest(
 
 def _save_record(
     client_code: str,
-    guest_id: str,
+    guest: dict[str, Any],
     payload: dict[str, Any],
 ) -> None:
     records = _records(client_code)
+    guest_id = str(guest.get("id"))
+    saved = save_transportation_assignment(client_code, guest, payload)
     records[guest_id] = {
         **records.get(guest_id, {}),
         **payload,
-        "updated_at": datetime.now().isoformat(timespec="seconds"),
+        "updated_at": saved.get("updated_at")
+        or datetime.now().isoformat(timespec="seconds"),
     }
 
 
@@ -468,25 +480,29 @@ def _render_transfer_editor(
         )
 
     if submitted:
-        _save_record(
-            client_code,
-            guest_id,
-            {
-                "status": status,
-                "transfer_type": transfer_type,
-                "pickup_time": pickup_time.strip(),
-                "flight": flight.strip(),
-                "pickup_location": pickup_location.strip(),
-                "destination": destination.strip(),
-                "vehicle_type": vehicle_type,
-                "vehicle": vehicle.strip(),
-                "driver": driver.strip(),
-                "driver_phone": driver_phone.strip(),
-                "notes": notes.strip(),
-            },
-        )
-        st.toast("Transportation details saved.", icon="✅")
-        st.rerun()
+        try:
+            _save_record(
+                client_code,
+                guest,
+                {
+                    "status": status,
+                    "transfer_type": transfer_type,
+                    "pickup_time": pickup_time.strip(),
+                    "flight": flight.strip(),
+                    "pickup_location": pickup_location.strip(),
+                    "destination": destination.strip(),
+                    "vehicle_type": vehicle_type,
+                    "vehicle": vehicle.strip(),
+                    "driver": driver.strip(),
+                    "driver_phone": driver_phone.strip(),
+                    "notes": notes.strip(),
+                },
+            )
+        except Exception as exc:
+            st.error(f"Transportation details could not be saved: {exc}")
+        else:
+            st.toast("Transportation details saved in Supabase.", icon="✅")
+            st.rerun()
 
     if record.get("updated_at"):
         st.caption(f"Last updated: {record['updated_at']}")
@@ -530,18 +546,18 @@ def render() -> None:
     config = load_client_config(client_code)
     client = config.get("client", {})
     hotel_name = str(client.get("name") or "Property")
-    guests = load_guests(client_code)
-
-    transport_guests = [
-        guest
-        for guest in guests
-        if str((guest.get("transport") or {}).get("transfer") or "").strip()
-        not in {"", "None"}
-    ]
+    try:
+        transport_guests = load_transportation_guests(client_code)
+    except DatabaseConfigurationError as exc:
+        st.error(f"Supabase is not configured: {exc}")
+        return
+    except Exception as exc:
+        st.error(f"Transportation data could not be loaded from Supabase: {exc}")
+        return
 
     st.markdown("# Guest Transportation")
     st.caption(
-        f"Daily transfer planning and operational control · {hotel_name}"
+        f"Daily transfer planning and operational control · {hotel_name} · Live Supabase data"
     )
 
     _render_metrics(transport_guests, client_code)
