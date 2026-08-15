@@ -1858,6 +1858,22 @@ def _reference_header_styles() -> None:
     st.markdown(
         """
         <style>
+        /* Streamlit gives every injected style-only Markdown element the
+           root vertical-block gap.  Several global style layers therefore
+           accumulated an empty band before the first visible component.
+           Remove only those top-level style nodes that precede the header. */
+        [data-testid="stMainBlockContainer"]
+        div[data-testid="stElementContainer"]:has(style):has(
+            ~ div[data-testid="stElementContainer"] .gcp-header
+        ){
+            display:none !important;
+            width:0 !important;
+            height:0 !important;
+            min-height:0 !important;
+            margin:0 !important;
+            padding:0 !important;
+        }
+
         [data-testid="stMainBlockContainer"]
         div[data-testid="stElementContainer"]:has(.gcp-header),
         [data-testid="stMainBlockContainer"]
