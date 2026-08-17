@@ -12,18 +12,33 @@ class DatabaseConfigurationError(RuntimeError):
 
 @lru_cache(maxsize=1)
 def get_supabase() -> Client:
-    """Return a cached Supabase client configured from Streamlit Secrets."""
+    """Return the default GCP-db Supabase client."""
+    return _get_supabase_client("SUPABASE_URL", "SUPABASE_SECRET_KEY", "GCP-db")
+
+
+@lru_cache(maxsize=1)
+def get_reports_supabase() -> Client:
+    """Return the dedicated OPERA DataHub Supabase client for Reports."""
+    return _get_supabase_client(
+        "REPORTS_SUPABASE_URL",
+        "REPORTS_SUPABASE_SECRET_KEY",
+        "OPERA-DATAHUB-EXPRESS",
+    )
+
+
+def _get_supabase_client(url_secret: str, key_secret: str, database_name: str) -> Client:
+    """Create a Supabase client from an explicit pair of Streamlit secrets."""
     try:
-        url = str(st.secrets["SUPABASE_URL"]).strip()
-        key = str(st.secrets["SUPABASE_SECRET_KEY"]).strip()
+        url = str(st.secrets[url_secret]).strip()
+        key = str(st.secrets[key_secret]).strip()
     except KeyError as exc:
         raise DatabaseConfigurationError(
-            "Missing SUPABASE_URL or SUPABASE_SECRET_KEY in Streamlit Secrets."
+            f"Missing {url_secret} or {key_secret} for {database_name} in Streamlit Secrets."
         ) from exc
 
     if not url or not key:
         raise DatabaseConfigurationError(
-            "SUPABASE_URL and SUPABASE_SECRET_KEY cannot be empty."
+            f"{url_secret} and {key_secret} for {database_name} cannot be empty."
         )
 
     return create_client(url, key)

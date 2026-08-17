@@ -32,10 +32,12 @@ class ReportsServiceTests(unittest.TestCase):
     def test_report_property_code_falls_back_to_client_code(self) -> None:
         self.assertEqual(service.report_property_code("GCPHOTEL", {}), "GCPHOTEL")
 
-    @patch.object(service, "get_supabase")
-    def test_available_report_years_deduplicates_and_sorts(self, get_supabase: MagicMock) -> None:
+    @patch.object(service, "get_reports_supabase")
+    def test_available_report_years_deduplicates_and_sorts(
+        self, get_reports_supabase: MagicMock
+    ) -> None:
         query = MagicMock()
-        get_supabase.return_value.table.return_value.select.return_value.eq.return_value = query
+        get_reports_supabase.return_value.table.return_value.select.return_value.eq.return_value = query
         query.execute.return_value.data = [
             {"calendar_year": 2025},
             {"calendar_year": "2026"},
@@ -45,13 +47,17 @@ class ReportsServiceTests(unittest.TestCase):
 
         self.assertEqual(service.available_report_years("SANDYL"), [2026, 2025])
 
-    @patch.object(service, "get_supabase")
-    def test_load_repeat_guest_monthly_filters_property_and_years(self, get_supabase: MagicMock) -> None:
+    @patch.object(service, "get_reports_supabase")
+    def test_load_repeat_guest_monthly_filters_property_and_years(
+        self, get_reports_supabase: MagicMock
+    ) -> None:
         query = MagicMock()
-        get_supabase.return_value.table.return_value.select.return_value.eq.return_value.in_.return_value.order.return_value = query
+        get_reports_supabase.return_value.table.return_value.select.return_value.eq.return_value.in_.return_value.order.return_value = query
         query.execute.return_value.data = [{"calendar_year": 2026, "calendar_month": 1}]
 
         rows = service.load_repeat_guest_monthly("SANDYL", [2026, 2025])
 
         self.assertEqual(rows, [{"calendar_year": 2026, "calendar_month": 1}])
-        get_supabase.return_value.table.assert_called_once_with("rpt_repeat_guest_monthly")
+        get_reports_supabase.return_value.table.assert_called_once_with(
+            "rpt_repeat_guest_monthly"
+        )

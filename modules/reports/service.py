@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from services.database import get_supabase
+from services.database import get_reports_supabase
 
 
 REPEAT_GUEST_MONTHLY_VIEW = "rpt_repeat_guest_monthly"
@@ -24,7 +24,7 @@ def _as_int(value: Any) -> int | None:
 def available_report_years(property_code: str) -> list[int]:
     """Return the years available in the monthly reporting view."""
     response = (
-        get_supabase()
+        get_reports_supabase()
         .table(REPEAT_GUEST_MONTHLY_VIEW)
         .select("calendar_year")
         .eq("property", property_code)
@@ -47,7 +47,7 @@ def load_repeat_guest_monthly(
         return []
 
     response = (
-        get_supabase()
+        get_reports_supabase()
         .table(REPEAT_GUEST_MONTHLY_VIEW)
         .select("*")
         .eq("property", property_code)
