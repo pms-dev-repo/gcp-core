@@ -1,10 +1,18 @@
 from __future__ import annotations
 
 from calendar import month_abbr
+from datetime import date
+from io import BytesIO
 from typing import Any
+from xml.sax.saxutils import escape
 
 import pandas as pd
 import streamlit as st
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import mm
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from core.config import get_active_client_code, load_client_config
 from modules.reports.service import (
@@ -115,6 +123,98 @@ def _negative_value_style(value: Any) -> str:
         return ""
 
 
+def _pdf_cell_value(column: str, value: Any) -> str:
+    if column == "Month":
+        return str(value)
+    if "%" in column:
+        return f"{float(value):.1%}"
+    return f"{int(value):,}"
+
+
+def _pdf_table(title: str, frame: pd.DataFrame) -> list[Any]:
+    table_data = [list(frame.columns)]
+    table_data.extend(
+        [
+            [_pdf_cell_value(column, row[column]) for column in frame.columns]
+            for _, row in frame.iterrows()
+        ]
+    )
+    column_widths = [21 * mm] + [20.5 * mm] * (len(frame.columns) - 1)
+    table = Table(table_data, colWidths=column_widths, repeatRows=1)
+    table_style = TableStyle(
+        [
+            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#12213f")),
+            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 6.5),
+            ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+            ("ALIGN", (0, 0), (0, -1), "LEFT"),
+            ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#cbd5e1")),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -2), [colors.white, colors.HexColor("#f8fafc")]),
+            ("BACKGROUND", (0, -1), (-1, -1), colors.HexColor("#e2e8f0")),
+            ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ]
+    )
+    for row_index, (_, row) in enumerate(frame.iterrows(), start=1):
+        for column_index, column in enumerate(frame.columns[1:], start=1):
+            try:
+                if float(row[column]) < 0:
+                    table_style.add(
+                        "TEXTCOLOR", (column_index, row_index), (column_index, row_index), colors.HexColor("#c62828")
+                    )
+            except (TypeError, ValueError):
+                continue
+    table.setStyle(table_style)
+
+    styles = getSampleStyleSheet()
+    return [
+        Paragraph(title, styles["Heading3"]),
+        Spacer(1, 2 * mm),
+        table,
+        Spacer(1, 6 * mm),
+    ]
+
+
+def build_repeat_guest_report_pdf(
+    property_name: str,
+    report_year: int,
+    comparison_year: int,
+    start_month: int,
+    end_month: int,
+    guest_table: pd.DataFrame,
+    night_table: pd.DataFrame,
+) -> bytes:
+    """Build a download-ready PDF matching the visible report filters."""
+    buffer = BytesIO()
+    document = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        leftMargin=8 * mm,
+        rightMargin=8 * mm,
+        topMargin=10 * mm,
+        bottomMargin=10 * mm,
+        title="Repeat Guest Report",
+    )
+    styles = getSampleStyleSheet()
+    month_range = f"{month_abbr[start_month]} - {month_abbr[end_month]}"
+    story: list[Any] = [
+        Paragraph("Repeat Guest Report", styles["Title"]),
+        Paragraph(escape(property_name), styles["Heading3"]),
+        Paragraph(
+            f"Period: {month_range} {report_year} | Comparison: {comparison_year}",
+            styles["BodyText"],
+        ),
+        Paragraph(f"Generated: {date.today():%d %b %Y}", styles["BodyText"]),
+        Spacer(1, 5 * mm),
+    ]
+    story.extend(_pdf_table("Repeat Guests", guest_table))
+    story.extend(_pdf_table("Repeat Nights", night_table))
+    document.build(story)
+    return buffer.getvalue()
+
+
 def _render_table(title: str, frame: pd.DataFrame) -> None:
     st.subheader(title)
     percentage_columns = [column for column in frame.columns if "%" in column]
@@ -205,6 +305,22 @@ def render(*_args, **_kwargs) -> None:
     st.caption(
         "Repeat and New classification is based on the guest's stay history at the property. "
         "Room nights are assigned to the arrival month."
+    )
+    pdf_bytes = build_repeat_guest_report_pdf(
+        property_name,
+        report_year,
+        comparison_year,
+        start_month,
+        end_month,
+        guest_table,
+        night_table,
+    )
+    st.download_button(
+        "Download report as PDF",
+        data=pdf_bytes,
+        file_name=f"repeat_guest_report_{property_code}_{report_year}.pdf",
+        mime="application/pdf",
+        key="reports_download_pdf",
     )
     _render_table("Repeat Guest Report", guest_table)
     _render_table("Repeat Nights Report", night_table)
