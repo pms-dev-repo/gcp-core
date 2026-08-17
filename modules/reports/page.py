@@ -270,6 +270,11 @@ def _render_statistics_manager(property_code: str) -> None:
         "other_revenue",
         "total_revenue",
     ]
+    percentage_columns = [
+        "occupancy_pct",
+        "occupancy_pct_minus_complimentary_house_use",
+        "occupancy_pct_minus_complimentary_house_use_out_of_order",
+    ]
     st.dataframe(
         pd.DataFrame(rows),
         use_container_width=True,
@@ -277,6 +282,10 @@ def _render_statistics_manager(property_code: str) -> None:
         column_config={
             column: st.column_config.NumberColumn(format="$%.2f")
             for column in revenue_columns
+        }
+        | {
+            column: st.column_config.NumberColumn(format="%.2f%%")
+            for column in percentage_columns
         },
     )
 
