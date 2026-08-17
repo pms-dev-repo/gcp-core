@@ -6,6 +6,7 @@ from services.database import get_reports_supabase
 
 
 REPEAT_GUEST_MONTHLY_VIEW = "rpt_repeat_guest_monthly"
+REPEAT_REVENUE_MONTHLY_VIEW = "rpt_repeat_revenue_monthly"
 
 
 def report_property_code(client_code: str, config: dict[str, Any]) -> str:
@@ -49,6 +50,26 @@ def load_repeat_guest_monthly(
     response = (
         get_reports_supabase()
         .table(REPEAT_GUEST_MONTHLY_VIEW)
+        .select("*")
+        .eq("property", property_code)
+        .in_("calendar_year", years)
+        .order("stay_month")
+        .execute()
+    )
+    return [dict(row) for row in (response.data or [])]
+
+
+def load_repeat_revenue_monthly(
+    property_code: str,
+    years: list[int],
+) -> list[dict[str, Any]]:
+    """Load monthly New and Repeat revenue for the selected property and years."""
+    if not years:
+        return []
+
+    response = (
+        get_reports_supabase()
+        .table(REPEAT_REVENUE_MONTHLY_VIEW)
         .select("*")
         .eq("property", property_code)
         .in_("calendar_year", years)

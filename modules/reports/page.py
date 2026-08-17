@@ -18,6 +18,7 @@ from core.config import get_active_client_code, load_client_config
 from modules.reports.service import (
     available_report_years,
     load_repeat_guest_monthly,
+    load_repeat_revenue_monthly,
     report_property_code,
 )
 from services.database import DatabaseConfigurationError
@@ -34,6 +35,15 @@ def _number(row: dict[str, Any] | None, key: str) -> int:
 
 def _ratio(numerator: int, denominator: int) -> float:
     return numerator / denominator if denominator else 0.0
+
+
+REVENUE_MEASURES = {
+    "Total Revenue": "total_revenue",
+    "Room Revenue": "room_revenue",
+    "F&B Revenue": "fb_revenue",
+    "Miscellaneous Revenue": "miscellaneous_revenue",
+    "Other Revenue": "other_revenue",
+}
 
 
 def _month_rows(
@@ -115,6 +125,78 @@ def _comparison_table(
     return pd.concat([frame, pd.DataFrame([totals])], ignore_index=True)
 
 
+def _amount(row: dict[str, Any] | None, key: str) -> float:
+    if not row:
+        return 0.0
+    try:
+        return float(row.get(key) or 0)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _revenue_comparison_table(
+    rows: list[dict[str, Any]],
+    report_year: int,
+    comparison_year: int,
+    start_month: int,
+    end_month: int,
+    revenue_key: str,
+) -> pd.DataFrame:
+    current = _month_rows(rows, report_year)
+    comparison = _month_rows(rows, comparison_year)
+    rendered: list[dict[str, Any]] = []
+    for month in range(start_month, end_month + 1):
+        current_repeat = _amount(current.get(month), f"repeat_{revenue_key}")
+        current_new = _amount(current.get(month), f"new_{revenue_key}")
+        comparison_repeat = _amount(comparison.get(month), f"repeat_{revenue_key}")
+        comparison_new = _amount(comparison.get(month), f"new_{revenue_key}")
+        current_total = current_repeat + current_new
+        comparison_total = comparison_repeat + comparison_new
+        rendered.append(
+            {
+                "Month": month_abbr[month],
+                f"{report_year} Repeat": current_repeat,
+                "% Repeat": _ratio(current_repeat, current_total),
+                f"{comparison_year} Repeat": comparison_repeat,
+                "% Repeat prior": _ratio(comparison_repeat, comparison_total),
+                "YOY Repeat": current_repeat - comparison_repeat,
+                "YOY Repeat %": _ratio(current_repeat, current_total)
+                - _ratio(comparison_repeat, comparison_total),
+                f"{report_year} New": current_new,
+                "% New": _ratio(current_new, current_total),
+                f"{comparison_year} New": comparison_new,
+                "% New prior": _ratio(comparison_new, comparison_total),
+                "YOY New": current_new - comparison_new,
+                "YOY New %": _ratio(current_new, current_total)
+                - _ratio(comparison_new, comparison_total),
+            }
+        )
+
+    frame = pd.DataFrame(rendered)
+    totals = {
+        "Month": "Total / Avg",
+        f"{report_year} Repeat": frame[f"{report_year} Repeat"].sum(),
+        f"{comparison_year} Repeat": frame[f"{comparison_year} Repeat"].sum(),
+        f"{report_year} New": frame[f"{report_year} New"].sum(),
+        f"{comparison_year} New": frame[f"{comparison_year} New"].sum(),
+    }
+    current_total = totals[f"{report_year} Repeat"] + totals[f"{report_year} New"]
+    comparison_total = totals[f"{comparison_year} Repeat"] + totals[f"{comparison_year} New"]
+    totals["% Repeat"] = _ratio(totals[f"{report_year} Repeat"], current_total)
+    totals["% Repeat prior"] = _ratio(
+        totals[f"{comparison_year} Repeat"], comparison_total
+    )
+    totals["YOY Repeat"] = (
+        totals[f"{report_year} Repeat"] - totals[f"{comparison_year} Repeat"]
+    )
+    totals["YOY Repeat %"] = totals["% Repeat"] - totals["% Repeat prior"]
+    totals["% New"] = _ratio(totals[f"{report_year} New"], current_total)
+    totals["% New prior"] = _ratio(totals[f"{comparison_year} New"], comparison_total)
+    totals["YOY New"] = totals[f"{report_year} New"] - totals[f"{comparison_year} New"]
+    totals["YOY New %"] = totals["% New"] - totals["% New prior"]
+    return pd.concat([frame, pd.DataFrame([totals])], ignore_index=True)
+
+
 def _negative_value_style(value: Any) -> str:
     """Highlight negative report measures without changing their displayed value."""
     try:
@@ -185,6 +267,8 @@ def build_repeat_guest_report_pdf(
     end_month: int,
     guest_table: pd.DataFrame,
     night_table: pd.DataFrame,
+    revenue_title: str | None = None,
+    revenue_table: pd.DataFrame | None = None,
 ) -> bytes:
     """Build a download-ready PDF matching the visible report filters."""
     buffer = BytesIO()
@@ -211,17 +295,24 @@ def build_repeat_guest_report_pdf(
     ]
     story.extend(_pdf_table("Repeat Guests", guest_table))
     story.extend(_pdf_table("Repeat Nights", night_table))
+    if revenue_title and revenue_table is not None:
+        story.extend(_pdf_table(revenue_title, revenue_table))
     document.build(story)
     return buffer.getvalue()
 
 
-def _render_table(title: str, frame: pd.DataFrame) -> None:
+def _render_table(title: str, frame: pd.DataFrame, currency: bool = False) -> None:
     st.subheader(title)
     percentage_columns = [column for column in frame.columns if "%" in column]
     numeric_columns = [column for column in frame.columns if column != "Month"]
-    styled_frame = frame.style.format(
-        {column: "{:.1%}" for column in percentage_columns}
-    ).map(_negative_value_style, subset=numeric_columns)
+    formats = {column: "{:.1%}" for column in percentage_columns}
+    if currency:
+        formats.update(
+            {column: "{:,.0f}" for column in numeric_columns if column not in percentage_columns}
+        )
+    styled_frame = frame.style.format(formats).map(
+        _negative_value_style, subset=numeric_columns
+    )
     st.dataframe(
         styled_frame,
         use_container_width=True,
@@ -277,6 +368,9 @@ def render(*_args, **_kwargs) -> None:
 
     try:
         rows = load_repeat_guest_monthly(property_code, [report_year, comparison_year])
+        revenue_rows = load_repeat_revenue_monthly(
+            property_code, [report_year, comparison_year]
+        )
     except Exception:
         st.error("The reporting data could not be loaded. Please try again.")
         return
@@ -301,6 +395,19 @@ def render(*_args, **_kwargs) -> None:
     night_table = _comparison_table(
         rows, report_year, comparison_year, start_month, end_month, "nights"
     )
+    revenue_name = st.selectbox(
+        "Revenue line",
+        list(REVENUE_MEASURES),
+        key="reports_revenue_line",
+    )
+    revenue_table = _revenue_comparison_table(
+        revenue_rows,
+        report_year,
+        comparison_year,
+        start_month,
+        end_month,
+        REVENUE_MEASURES[revenue_name],
+    )
 
     st.caption(
         "Repeat and New classification is based on the guest's stay history at the property. "
@@ -314,6 +421,8 @@ def render(*_args, **_kwargs) -> None:
         end_month,
         guest_table,
         night_table,
+        f"{revenue_name} Report",
+        revenue_table,
     )
     st.download_button(
         "Download report as PDF",
@@ -324,3 +433,4 @@ def render(*_args, **_kwargs) -> None:
     )
     _render_table("Repeat Guest Report", guest_table)
     _render_table("Repeat Nights Report", night_table)
+    _render_table(f"{revenue_name} Report", revenue_table, currency=True)

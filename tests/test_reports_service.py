@@ -61,3 +61,18 @@ class ReportsServiceTests(unittest.TestCase):
         get_reports_supabase.return_value.table.assert_called_once_with(
             "rpt_repeat_guest_monthly"
         )
+
+    @patch.object(service, "get_reports_supabase")
+    def test_load_repeat_revenue_monthly_filters_property_and_years(
+        self, get_reports_supabase: MagicMock
+    ) -> None:
+        query = MagicMock()
+        get_reports_supabase.return_value.table.return_value.select.return_value.eq.return_value.in_.return_value.order.return_value = query
+        query.execute.return_value.data = [{"calendar_year": 2026, "room_revenue": 100}]
+
+        rows = service.load_repeat_revenue_monthly("SANDYL", [2026, 2025])
+
+        self.assertEqual(rows, [{"calendar_year": 2026, "room_revenue": 100}])
+        get_reports_supabase.return_value.table.assert_called_once_with(
+            "rpt_repeat_revenue_monthly"
+        )
