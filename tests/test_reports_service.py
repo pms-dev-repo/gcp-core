@@ -76,3 +76,18 @@ class ReportsServiceTests(unittest.TestCase):
         get_reports_supabase.return_value.table.assert_called_once_with(
             "vw_daily_figures"
         )
+
+    @patch.object(service, "get_reports_supabase")
+    def test_load_statistics_manager_filters_the_active_property(
+        self, get_reports_supabase: MagicMock
+    ) -> None:
+        query = MagicMock()
+        get_reports_supabase.return_value.table.return_value.select.return_value.eq.return_value.order.return_value = query
+        query.execute.return_value.data = [{"business_date": "2026-08-15"}]
+
+        rows = service.load_statistics_manager("SANDYL")
+
+        self.assertEqual(rows, [{"business_date": "2026-08-15"}])
+        get_reports_supabase.return_value.table.assert_called_once_with(
+            "rpt_statistics_manager"
+        )

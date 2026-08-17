@@ -19,6 +19,7 @@ from modules.reports.service import (
     available_report_years,
     load_daily_figures,
     load_repeat_guest_monthly,
+    load_statistics_manager,
     report_property_code,
 )
 from services.database import DatabaseConfigurationError
@@ -248,13 +249,31 @@ def _render_daily_figures() -> None:
     st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
 
+def _render_statistics_manager(property_code: str) -> None:
+    try:
+        rows = load_statistics_manager(property_code)
+    except DatabaseConfigurationError as exc:
+        st.error(str(exc))
+        return
+    except Exception:
+        st.error("The Statistics Manager data could not be loaded. Please try again.")
+        return
+
+    if not rows:
+        st.info("No Statistics Manager data is available yet.")
+        return
+
+    st.subheader("Statistics Manager")
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+
 def _open_report(report_name: str) -> None:
     st.session_state.reports_selected_report = report_name
 
 
 def _render_report_catalog() -> None:
     st.subheader("Available reports")
-    repeat_column, daily_column = st.columns(2, gap="large")
+    repeat_column, daily_column, statistics_column = st.columns(3, gap="large")
 
     with repeat_column:
         with st.container(border=True):
@@ -278,6 +297,18 @@ def _render_report_catalog() -> None:
                 use_container_width=True,
                 on_click=_open_report,
                 args=("Daily Figures",),
+            )
+
+    with statistics_column:
+        with st.container(border=True):
+            st.markdown("### Statistics Manager")
+            st.caption("Daily occupancy, room movement, revenue, and tax statistics.")
+            st.button(
+                "Open Statistics Manager",
+                key="open_statistics_manager",
+                use_container_width=True,
+                on_click=_open_report,
+                args=("Statistics Manager",),
             )
 
 
@@ -312,6 +343,9 @@ def render(*_args, **_kwargs) -> None:
 
     if selected_report == "Daily Figures":
         _render_daily_figures()
+        return
+    if selected_report == "Statistics Manager":
+        _render_statistics_manager(property_code)
         return
 
     try:

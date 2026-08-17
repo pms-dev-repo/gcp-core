@@ -7,6 +7,35 @@ from services.database import get_reports_supabase
 
 REPEAT_GUEST_MONTHLY_VIEW = "rpt_repeat_guest_monthly"
 DAILY_FIGURES_VIEW = "vw_daily_figures"
+STATISTICS_MANAGER_TABLE = "rpt_statistics_manager"
+STATISTICS_MANAGER_COLUMNS = [
+    "business_date",
+    "property",
+    "arrival_rooms",
+    "departure_rooms",
+    "individual_rooms",
+    "group_rooms",
+    "no_show_rooms",
+    "cancel_rooms",
+    "walk_in_rooms",
+    "house_use_rooms",
+    "day_use_rooms",
+    "complimentary_rooms",
+    "extended_stay_rooms",
+    "occupancy_pct",
+    "occupancy_pct_minus_complimentary_house_use",
+    "occupancy_pct_minus_complimentary_house_use_out_of_order",
+    "occupied_rooms",
+    "out_of_order_rooms",
+    "room_revenue",
+    "fb_revenue",
+    "other_revenue",
+    "total_revenue",
+    "room_tax",
+    "fb_tax",
+    "other_tax",
+    "total_tax",
+]
 
 
 def report_property_code(client_code: str, config: dict[str, Any]) -> str:
@@ -67,6 +96,19 @@ def load_daily_figures() -> list[dict[str, Any]]:
         .select("*")
         .order("business_date", desc=True)
         .order("sort_order")
+        .execute()
+    )
+    return [dict(row) for row in (response.data or [])]
+
+
+def load_statistics_manager(property_code: str) -> list[dict[str, Any]]:
+    """Load Statistics Manager rows for the active property."""
+    response = (
+        get_reports_supabase()
+        .table(STATISTICS_MANAGER_TABLE)
+        .select(",".join(STATISTICS_MANAGER_COLUMNS))
+        .eq("property", property_code)
+        .order("business_date", desc=True)
         .execute()
     )
     return [dict(row) for row in (response.data or [])]
