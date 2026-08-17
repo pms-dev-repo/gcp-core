@@ -6,6 +6,7 @@ from services.database import get_reports_supabase
 
 
 REPEAT_GUEST_MONTHLY_VIEW = "rpt_repeat_guest_monthly"
+DAILY_FIGURES_VIEW = "vw_daily_figures"
 
 
 def report_property_code(client_code: str, config: dict[str, Any]) -> str:
@@ -53,6 +54,19 @@ def load_repeat_guest_monthly(
         .eq("property", property_code)
         .in_("calendar_year", years)
         .order("stay_month")
+        .execute()
+    )
+    return [dict(row) for row in (response.data or [])]
+
+
+def load_daily_figures() -> list[dict[str, Any]]:
+    """Load Daily Figures in the display order defined by the source view."""
+    response = (
+        get_reports_supabase()
+        .table(DAILY_FIGURES_VIEW)
+        .select("*")
+        .order("business_date", desc=True)
+        .order("sort_order")
         .execute()
     )
     return [dict(row) for row in (response.data or [])]

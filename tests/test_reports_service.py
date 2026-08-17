@@ -61,3 +61,18 @@ class ReportsServiceTests(unittest.TestCase):
         get_reports_supabase.return_value.table.assert_called_once_with(
             "rpt_repeat_guest_monthly"
         )
+
+    @patch.object(service, "get_reports_supabase")
+    def test_load_daily_figures_orders_the_source_rows(
+        self, get_reports_supabase: MagicMock
+    ) -> None:
+        query = MagicMock()
+        get_reports_supabase.return_value.table.return_value.select.return_value.order.return_value.order.return_value = query
+        query.execute.return_value.data = [{"metric": "Rooms"}]
+
+        rows = service.load_daily_figures()
+
+        self.assertEqual(rows, [{"metric": "Rooms"}])
+        get_reports_supabase.return_value.table.assert_called_once_with(
+            "vw_daily_figures"
+        )

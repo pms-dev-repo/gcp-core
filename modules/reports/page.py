@@ -17,6 +17,7 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, Tabl
 from core.config import get_active_client_code, load_client_config
 from modules.reports.service import (
     available_report_years,
+    load_daily_figures,
     load_repeat_guest_monthly,
     report_property_code,
 )
@@ -229,6 +230,24 @@ def _render_table(title: str, frame: pd.DataFrame) -> None:
     )
 
 
+def _render_daily_figures() -> None:
+    try:
+        rows = load_daily_figures()
+    except DatabaseConfigurationError as exc:
+        st.error(str(exc))
+        return
+    except Exception:
+        st.error("The Daily Figures data could not be loaded. Please try again.")
+        return
+
+    if not rows:
+        st.info("No Daily Figures data is available yet.")
+        return
+
+    st.subheader("Daily Figures")
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+
 def render(*_args, **_kwargs) -> None:
     client_code = get_active_client_code()
     config = load_client_config(client_code)
@@ -248,6 +267,15 @@ def render(*_args, **_kwargs) -> None:
         """,
         unsafe_allow_html=True,
     )
+
+    selected_report = st.selectbox(
+        "Select report",
+        ["Repeat Guest Report", "Daily Figures"],
+        key="reports_selected_report",
+    )
+    if selected_report == "Daily Figures":
+        _render_daily_figures()
+        return
 
     try:
         years = available_report_years(property_code)
