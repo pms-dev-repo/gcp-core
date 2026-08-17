@@ -121,7 +121,7 @@ def _render_table(title: str, frame: pd.DataFrame) -> None:
     numeric_columns = [column for column in frame.columns if column != "Month"]
     styled_frame = frame.style.format(
         {column: "{:.1%}" for column in percentage_columns}
-    ).applymap(_negative_value_style, subset=numeric_columns)
+    ).map(_negative_value_style, subset=numeric_columns)
     st.dataframe(
         styled_frame,
         use_container_width=True,
