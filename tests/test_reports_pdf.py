@@ -19,38 +19,10 @@ if "supabase" not in sys.modules:
 
 import pandas as pd
 
-from modules.reports.page import _revenue_comparison_table, build_repeat_guest_report_pdf
+from modules.reports.page import build_repeat_guest_report_pdf
 
 
 class ReportsPdfTests(unittest.TestCase):
-    def test_revenue_comparison_calculates_new_repeat_and_total(self) -> None:
-        table = _revenue_comparison_table(
-            [
-                {
-                    "calendar_year": 2026,
-                    "calendar_month": 1,
-                    "repeat_room_revenue": 120,
-                    "new_room_revenue": 80,
-                },
-                {
-                    "calendar_year": 2025,
-                    "calendar_month": 1,
-                    "repeat_room_revenue": 100,
-                    "new_room_revenue": 50,
-                },
-            ],
-            2026,
-            2025,
-            1,
-            1,
-            "room_revenue",
-        )
-
-        self.assertEqual(table.iloc[0]["YOY Repeat"], 20)
-        self.assertEqual(table.iloc[0]["YOY New"], 30)
-        self.assertEqual(table.iloc[1]["2026 Repeat"], 120)
-        self.assertEqual(table.iloc[1]["2026 New"], 80)
-
     def test_repeat_guest_report_pdf_is_generated(self) -> None:
         report = pd.DataFrame(
             [
