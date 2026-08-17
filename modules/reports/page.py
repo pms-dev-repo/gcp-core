@@ -107,11 +107,23 @@ def _comparison_table(
     return pd.concat([frame, pd.DataFrame([totals])], ignore_index=True)
 
 
+def _negative_value_style(value: Any) -> str:
+    """Highlight negative report measures without changing their displayed value."""
+    try:
+        return "color: #c62828; font-weight: 600;" if float(value) < 0 else ""
+    except (TypeError, ValueError):
+        return ""
+
+
 def _render_table(title: str, frame: pd.DataFrame) -> None:
     st.subheader(title)
     percentage_columns = [column for column in frame.columns if "%" in column]
+    numeric_columns = [column for column in frame.columns if column != "Month"]
+    styled_frame = frame.style.format(
+        {column: "{:.1%}" for column in percentage_columns}
+    ).applymap(_negative_value_style, subset=numeric_columns)
     st.dataframe(
-        frame.style.format({column: "{:.1%}" for column in percentage_columns}),
+        styled_frame,
         use_container_width=True,
         hide_index=True,
     )
