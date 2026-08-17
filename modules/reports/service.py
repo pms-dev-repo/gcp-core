@@ -8,6 +8,7 @@ from services.database import get_reports_supabase
 REPEAT_GUEST_MONTHLY_VIEW = "rpt_repeat_guest_monthly"
 DAILY_FIGURES_VIEW = "vw_daily_figures"
 STATISTICS_MANAGER_TABLE = "rpt_statistics_manager"
+ROOM_PERFORMANCE_VIEW = "rpt_room_performance"
 STATISTICS_MANAGER_COLUMNS = [
     "business_date",
     "property",
@@ -109,6 +110,20 @@ def load_statistics_manager(property_code: str) -> list[dict[str, Any]]:
         .select(",".join(STATISTICS_MANAGER_COLUMNS))
         .eq("property", property_code)
         .order("business_date", desc=True)
+        .execute()
+    )
+    return [dict(row) for row in (response.data or [])]
+
+
+def load_room_performance(property_code: str) -> list[dict[str, Any]]:
+    """Load the room-night ranking for the active property."""
+    response = (
+        get_reports_supabase()
+        .table(ROOM_PERFORMANCE_VIEW)
+        .select("*")
+        .eq("property", property_code)
+        .order("room_nights", desc=True)
+        .order("stay_count", desc=True)
         .execute()
     )
     return [dict(row) for row in (response.data or [])]

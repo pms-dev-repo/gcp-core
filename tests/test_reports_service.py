@@ -91,3 +91,18 @@ class ReportsServiceTests(unittest.TestCase):
         get_reports_supabase.return_value.table.assert_called_once_with(
             "rpt_statistics_manager"
         )
+
+    @patch.object(service, "get_reports_supabase")
+    def test_load_room_performance_orders_the_room_night_ranking(
+        self, get_reports_supabase: MagicMock
+    ) -> None:
+        query = MagicMock()
+        get_reports_supabase.return_value.table.return_value.select.return_value.eq.return_value.order.return_value.order.return_value = query
+        query.execute.return_value.data = [{"room_number": "324", "room_nights": 1325}]
+
+        rows = service.load_room_performance("SANDYL")
+
+        self.assertEqual(rows, [{"room_number": "324", "room_nights": 1325}])
+        get_reports_supabase.return_value.table.assert_called_once_with(
+            "rpt_room_performance"
+        )

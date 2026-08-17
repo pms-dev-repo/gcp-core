@@ -19,6 +19,7 @@ from modules.reports.service import (
     available_report_years,
     load_daily_figures,
     load_repeat_guest_monthly,
+    load_room_performance,
     load_statistics_manager,
     report_property_code,
 )
@@ -318,13 +319,51 @@ def _render_statistics_manager(property_code: str) -> None:
     )
 
 
+def _render_room_performance(property_code: str) -> None:
+    try:
+        rows = load_room_performance(property_code)
+    except DatabaseConfigurationError as exc:
+        st.error(str(exc))
+        return
+    except Exception:
+        st.error("The Room Performance data could not be loaded. Please try again.")
+        return
+
+    if not rows:
+        st.info("No Room Performance data is available yet.")
+        return
+
+    frame = pd.DataFrame(rows)
+    frame.insert(0, "Rank", range(1, len(frame) + 1))
+    frame = frame.rename(
+        columns={
+            "room_number": "Room",
+            "room_type": "Room Type",
+            "room_nights": "Room Nights",
+            "stay_count": "Stays",
+        }
+    )
+    st.subheader("Room Performance")
+    st.caption("Ranking is based on total room nights across eligible checked-out stays.")
+    st.dataframe(
+        frame,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Rank": st.column_config.NumberColumn(format="%d"),
+            "Room Nights": st.column_config.NumberColumn(format="%d"),
+            "Stays": st.column_config.NumberColumn(format="%d"),
+        },
+    )
+
+
 def _open_report(report_name: str) -> None:
     st.session_state.reports_selected_report = report_name
 
 
 def _render_report_catalog() -> None:
     st.subheader("Available reports")
-    repeat_column, daily_column, statistics_column = st.columns(3, gap="large")
+    repeat_column, daily_column = st.columns(2, gap="large")
 
     with repeat_column:
         with st.container(border=True):
@@ -350,6 +389,8 @@ def _render_report_catalog() -> None:
                 args=("Daily Figures",),
             )
 
+    statistics_column, room_column = st.columns(2, gap="large")
+
     with statistics_column:
         with st.container(border=True):
             st.markdown("### Statistics Manager")
@@ -360,6 +401,18 @@ def _render_report_catalog() -> None:
                 use_container_width=True,
                 on_click=_open_report,
                 args=("Statistics Manager",),
+            )
+
+    with room_column:
+        with st.container(border=True):
+            st.markdown("### Room Performance")
+            st.caption("Ranking of the most-used rooms by total room nights and stays.")
+            st.button(
+                "Open Room Performance",
+                key="open_room_performance",
+                use_container_width=True,
+                on_click=_open_report,
+                args=("Room Performance",),
             )
 
 
@@ -397,6 +450,9 @@ def render(*_args, **_kwargs) -> None:
         return
     if selected_report == "Statistics Manager":
         _render_statistics_manager(property_code)
+        return
+    if selected_report == "Room Performance":
+        _render_room_performance(property_code)
         return
 
     try:
