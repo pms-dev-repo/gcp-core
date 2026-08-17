@@ -264,7 +264,21 @@ def _render_statistics_manager(property_code: str) -> None:
         return
 
     st.subheader("Statistics Manager")
-    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+    revenue_columns = [
+        "room_revenue",
+        "fb_revenue",
+        "other_revenue",
+        "total_revenue",
+    ]
+    st.dataframe(
+        pd.DataFrame(rows),
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            column: st.column_config.NumberColumn(format="$%.2f")
+            for column in revenue_columns
+        },
+    )
 
 
 def _open_report(report_name: str) -> None:
