@@ -367,10 +367,10 @@ def _render_report_catalog() -> None:
 
     with repeat_column:
         with st.container(border=True):
-            st.markdown("### Repeat Guest Report")
+            st.markdown("### 👥 Repeat Guest Report")
             st.caption("New and Repeat guests, room nights, and year-over-year variance.")
             st.button(
-                "Open Repeat Guest Report",
+                "👥 Open Repeat Guest Report",
                 key="open_repeat_guest_report",
                 use_container_width=True,
                 on_click=_open_report,
@@ -379,10 +379,10 @@ def _render_report_catalog() -> None:
 
     with daily_column:
         with st.container(border=True):
-            st.markdown("### Daily Figures")
+            st.markdown("### 📅 Daily Figures")
             st.caption("Daily in-house, departures, arrivals, expected in-house, and EXO.")
             st.button(
-                "Open Daily Figures",
+                "📅 Open Daily Figures",
                 key="open_daily_figures",
                 use_container_width=True,
                 on_click=_open_report,
@@ -393,10 +393,10 @@ def _render_report_catalog() -> None:
 
     with statistics_column:
         with st.container(border=True):
-            st.markdown("### Statistics Manager")
+            st.markdown("### 📊 Statistics Manager")
             st.caption("Daily occupancy, room movement, revenue, and tax statistics.")
             st.button(
-                "Open Statistics Manager",
+                "📊 Open Statistics Manager",
                 key="open_statistics_manager",
                 use_container_width=True,
                 on_click=_open_report,
@@ -405,10 +405,10 @@ def _render_report_catalog() -> None:
 
     with room_column:
         with st.container(border=True):
-            st.markdown("### Room Performance")
+            st.markdown("### 🛏️ Room Performance")
             st.caption("Ranking of the most-used rooms by total room nights and stays.")
             st.button(
-                "Open Room Performance",
+                "🛏️ Open Room Performance",
                 key="open_room_performance",
                 use_container_width=True,
                 on_click=_open_report,
