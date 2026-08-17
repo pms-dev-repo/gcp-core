@@ -92,6 +92,11 @@ MODULE_META: dict[str, dict[str, str]] = {
         "title": "Document History",
         "description": "Generated and sent document activity",
     },
+    "reports": {
+        "icon": "▤",
+        "title": "Reports",
+        "description": "Property performance and guest analytics",
+    },
     "templates": {
         "icon": "▤",
         "title": "Template Studio",
@@ -340,7 +345,7 @@ def render(guests: list[dict[str, Any]] | None = None) -> None:
                 _render_module_card(module_key, metrics)
 
     quick_modules = [
-        key for key in ("history", "templates", "administration")
+        key for key in ("reports", "history", "templates", "administration")
         if module_enabled(key, config)
     ]
     if quick_modules:

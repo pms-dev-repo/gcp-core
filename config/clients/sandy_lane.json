@@ -25,6 +25,7 @@
     "confirmation_letters": false,
     "registration_cards": false,
     "guest_transportation": true,
+    "reports": true,
     "history": false,
     "templates": true,
     "administration": true,
@@ -33,6 +34,9 @@
   },
   "guest_transportation": {
     "data_client_code": "GCPHOTEL"
+  },
+  "reports": {
+    "property_code": "SANDYL"
   },
   "guest_sms": {
     "sender_name": "Sandy Lane",

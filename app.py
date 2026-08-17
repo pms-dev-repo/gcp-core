@@ -21,6 +21,7 @@ from modules.registration_cards.guest_form import (
     render_guest_registration_form,
 )
 from modules.registration_cards.page import render as render_registration_cards
+from modules.reports.page import render as render_reports
 from modules.shared_placeholder import render_module_placeholder
 from services.guest_service import load_guests
 from utils.state import initialize_state
@@ -95,6 +96,8 @@ elif active_page == "guest_transportation":
     render_guest_transportation()
 elif active_page == "flight_center":
     render_flight_center()
+elif active_page == "reports":
+    render_reports()
 elif active_page == "administration":
     render_administration()
 elif active_page == "templates":

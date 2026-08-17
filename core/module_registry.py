@@ -59,6 +59,7 @@ MODULES = (
         parent="Front Office",
     ),
     ModuleDefinition("history", "Document History", "◷", "main"),
+    ModuleDefinition("reports", "Reports", "▤", "management"),
     ModuleDefinition("administration", "Administration", "⚙", "management"),
     ModuleDefinition("templates", "Template Studio", "▤", "management"),
     ModuleDefinition("settings", "Settings", "◉", "management"),
