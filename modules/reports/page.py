@@ -264,19 +264,47 @@ def _render_statistics_manager(property_code: str) -> None:
         return
 
     st.subheader("Statistics Manager")
+    display_names = {
+        "business_date": "Date",
+        "property": "Property",
+        "arrival_rooms": "Arr.",
+        "departure_rooms": "Dep.",
+        "individual_rooms": "Ind.",
+        "group_rooms": "Group",
+        "no_show_rooms": "No Show",
+        "cancel_rooms": "Cancel",
+        "walk_in_rooms": "Walk-In",
+        "house_use_rooms": "House Use",
+        "day_use_rooms": "Day Use",
+        "complimentary_rooms": "Comp.",
+        "extended_stay_rooms": "Ext. Stay",
+        "occupancy_pct": "Occ. %",
+        "occupancy_pct_minus_complimentary_house_use": "Net Occ. %",
+        "occupancy_pct_minus_complimentary_house_use_out_of_order": "Adj. Occ. %",
+        "occupied_rooms": "Occupied",
+        "out_of_order_rooms": "OOO",
+        "room_revenue": "Room Rev.",
+        "fb_revenue": "F&B Rev.",
+        "other_revenue": "Other Rev.",
+        "total_revenue": "Total Rev.",
+        "room_tax": "Room Tax",
+        "fb_tax": "F&B Tax",
+        "other_tax": "Other Tax",
+        "total_tax": "Total Tax",
+    }
     revenue_columns = [
-        "room_revenue",
-        "fb_revenue",
-        "other_revenue",
-        "total_revenue",
+        "Room Rev.",
+        "F&B Rev.",
+        "Other Rev.",
+        "Total Rev.",
     ]
     percentage_columns = [
-        "occupancy_pct",
-        "occupancy_pct_minus_complimentary_house_use",
-        "occupancy_pct_minus_complimentary_house_use_out_of_order",
+        "Occ. %",
+        "Net Occ. %",
+        "Adj. Occ. %",
     ]
     st.dataframe(
-        pd.DataFrame(rows),
+        pd.DataFrame(rows).rename(columns=display_names),
         use_container_width=True,
         hide_index=True,
         column_config={
