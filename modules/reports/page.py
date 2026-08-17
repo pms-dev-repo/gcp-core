@@ -248,6 +248,39 @@ def _render_daily_figures() -> None:
     st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
 
 
+def _open_report(report_name: str) -> None:
+    st.session_state.reports_selected_report = report_name
+
+
+def _render_report_catalog() -> None:
+    st.subheader("Available reports")
+    repeat_column, daily_column = st.columns(2, gap="large")
+
+    with repeat_column:
+        with st.container(border=True):
+            st.markdown("### Repeat Guest Report")
+            st.caption("New and Repeat guests, room nights, and year-over-year variance.")
+            st.button(
+                "Open Repeat Guest Report",
+                key="open_repeat_guest_report",
+                use_container_width=True,
+                on_click=_open_report,
+                args=("Repeat Guest Report",),
+            )
+
+    with daily_column:
+        with st.container(border=True):
+            st.markdown("### Daily Figures")
+            st.caption("Daily in-house, departures, arrivals, expected in-house, and EXO.")
+            st.button(
+                "Open Daily Figures",
+                key="open_daily_figures",
+                use_container_width=True,
+                on_click=_open_report,
+                args=("Daily Figures",),
+            )
+
+
 def render(*_args, **_kwargs) -> None:
     client_code = get_active_client_code()
     config = load_client_config(client_code)
@@ -268,11 +301,15 @@ def render(*_args, **_kwargs) -> None:
         unsafe_allow_html=True,
     )
 
-    selected_report = st.selectbox(
-        "Select report",
-        ["Repeat Guest Report", "Daily Figures"],
-        key="reports_selected_report",
-    )
+    selected_report = st.session_state.get("reports_selected_report")
+    if not selected_report:
+        _render_report_catalog()
+        return
+
+    if st.button("← All reports", key="reports_back_to_catalog"):
+        st.session_state.pop("reports_selected_report", None)
+        st.rerun()
+
     if selected_report == "Daily Figures":
         _render_daily_figures()
         return
