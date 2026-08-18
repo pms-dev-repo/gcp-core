@@ -271,14 +271,9 @@ def _render_filters(
 ) -> tuple[date | None, str, str, str]:
     include_direction = direction == "All"
     row1 = st.columns([1.1, 1, 1, 1.7] if include_direction else [1.1, 1, 1.7])
-    selected_date = row1[0].date_input(
-        "Business date",
-        value=st.session_state.get(
-            f"transport_{key_prefix}_business_date",
-            date.today(),
-        ),
-        key=f"transport_{key_prefix}_business_date",
-    )
+    selected_date = date.today()
+    row1[0].caption("Business date")
+    row1[0].markdown(f"**Today - {selected_date:%d %b %Y}**")
     status_column = 2 if include_direction else 1
     search_column = 3 if include_direction else 2
     direction_filter = direction
