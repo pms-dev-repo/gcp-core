@@ -23,6 +23,7 @@ from modules.reports.service import (
     load_statistics_manager,
     report_property_code,
 )
+from modules.reports.folios import render_guest_folios
 from services.database import DatabaseConfigurationError
 
 
@@ -415,6 +416,19 @@ def _render_report_catalog() -> None:
                 args=("Room Performance",),
             )
 
+    folio_column, _ = st.columns(2, gap="large")
+    with folio_column:
+        with st.container(border=True):
+            st.markdown("### 🧾 Guest Folios")
+            st.caption("Search guest folios by guest name or room, then preview, download, or simulate email delivery.")
+            st.button(
+                "🧾 Open Guest Folios",
+                key="open_guest_folios",
+                use_container_width=True,
+                on_click=_open_report,
+                args=("Guest Folios",),
+            )
+
 
 def render(*_args, **_kwargs) -> None:
     client_code = get_active_client_code()
@@ -453,6 +467,9 @@ def render(*_args, **_kwargs) -> None:
         return
     if selected_report == "Room Performance":
         _render_room_performance(property_code)
+        return
+    if selected_report == "Guest Folios":
+        render_guest_folios(property_code, property_name)
         return
 
     try:

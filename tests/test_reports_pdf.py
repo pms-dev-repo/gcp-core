@@ -19,6 +19,7 @@ if "supabase" not in sys.modules:
 
 import pandas as pd
 
+from modules.reports.folios import build_guest_folio_pdf
 from modules.reports.page import build_repeat_guest_report_pdf
 
 
@@ -46,6 +47,37 @@ class ReportsPdfTests(unittest.TestCase):
 
         pdf = build_repeat_guest_report_pdf(
             "Sandy Lane", 2026, 2025, 1, 1, report, report
+        )
+
+        self.assertTrue(pdf.startswith(b"%PDF"))
+        self.assertGreater(len(pdf), 1_000)
+
+    def test_guest_folio_pdf_is_generated(self) -> None:
+        pdf = build_guest_folio_pdf(
+            "Sandy Lane",
+            {
+                "bill_no": "196992",
+                "display_name": "Test Guest",
+                "room": "317",
+                "bill_generation_date": "2026-08-01",
+                "status": "OK",
+            },
+            [
+                {
+                    "trx_date": "2026-08-01",
+                    "trx_code": "1000",
+                    "transaction_description": "Room charge",
+                    "ft_debit": 100,
+                    "ft_credit": 0,
+                },
+                {
+                    "trx_date": "2026-08-02",
+                    "trx_code": "2000",
+                    "transaction_description": "Payment",
+                    "ft_debit": 0,
+                    "ft_credit": 100,
+                },
+            ],
         )
 
         self.assertTrue(pdf.startswith(b"%PDF"))

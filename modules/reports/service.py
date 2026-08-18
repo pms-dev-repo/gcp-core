@@ -9,6 +9,8 @@ REPEAT_GUEST_MONTHLY_VIEW = "rpt_repeat_guest_monthly"
 DAILY_FIGURES_VIEW = "vw_daily_figures"
 STATISTICS_MANAGER_TABLE = "rpt_statistics_manager"
 ROOM_PERFORMANCE_VIEW = "rpt_room_performance"
+GUEST_FOLIO_DETAILS_TABLE = "rpt_guest_folio_details"
+GUEST_FOLIO_SUMMARY_VIEW = "rpt_guest_folio_summary"
 STATISTICS_MANAGER_COLUMNS = [
     "business_date",
     "property",
@@ -124,6 +126,52 @@ def load_room_performance(property_code: str) -> list[dict[str, Any]]:
         .eq("property", property_code)
         .order("room_nights", desc=True)
         .order("stay_count", desc=True)
+        .execute()
+    )
+    return [dict(row) for row in (response.data or [])]
+
+
+def load_guest_folio_summaries(
+    property_code: str,
+    search_term: str,
+) -> list[dict[str, Any]]:
+    """Find guest folios by guest name, room, or bill number."""
+    normalized_search = search_term.strip().replace(",", " ")
+    if not normalized_search:
+        return []
+
+    response = (
+        get_reports_supabase()
+        .table(GUEST_FOLIO_SUMMARY_VIEW)
+        .select("*")
+        .eq("property", property_code)
+        .or_(
+            "display_name.ilike.%{term}%,room.ilike.%{term}%,bill_no.ilike.%{term}%".format(
+                term=normalized_search
+            )
+        )
+        .order("bill_generation_date", desc=True)
+        .limit(100)
+        .execute()
+    )
+    return [dict(row) for row in (response.data or [])]
+
+
+def load_guest_folio_transactions(
+    property_code: str,
+    bill_no: str,
+) -> list[dict[str, Any]]:
+    """Load the transaction rows that make up one selected folio."""
+    response = (
+        get_reports_supabase()
+        .table(GUEST_FOLIO_DETAILS_TABLE)
+        .select(
+            "trx_no,trx_code,trx_date,ft_debit,ft_credit,transaction_description"
+        )
+        .eq("property", property_code)
+        .eq("bill_no", bill_no)
+        .order("trx_date")
+        .order("folio_detail_id")
         .execute()
     )
     return [dict(row) for row in (response.data or [])]
