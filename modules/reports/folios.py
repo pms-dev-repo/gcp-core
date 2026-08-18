@@ -21,7 +21,9 @@ from modules.reports.service import (
 from services.database import DatabaseConfigurationError
 
 
-GCP_LOGO_PATH = Path(__file__).resolve().parents[2] / "assets" / "gcp_logo.png"
+SANDY_LANE_LOGO_PATH = (
+    Path(__file__).resolve().parents[2] / "assets" / "sandy_lane_logo.png"
+)
 
 
 def _as_amount(value: Any) -> float:
@@ -129,7 +131,7 @@ def build_guest_folio_pdf(
             ]
         )
     )
-    logo = Image(str(GCP_LOGO_PATH), width=45 * mm, height=12 * mm)
+    logo = Image(str(SANDY_LANE_LOGO_PATH), width=44 * mm, height=27 * mm)
     header = Table(
         [[logo, Paragraph("Guest Folio", styles["Title"])]],
         colWidths=[52 * mm, 116 * mm],
