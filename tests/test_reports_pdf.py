@@ -19,7 +19,7 @@ if "supabase" not in sys.modules:
 
 import pandas as pd
 
-from modules.reports.folios import build_guest_folio_pdf
+from modules.reports.folios import _simulated_email, build_guest_folio_pdf
 from modules.reports.page import build_repeat_guest_report_pdf
 
 
@@ -82,3 +82,6 @@ class ReportsPdfTests(unittest.TestCase):
 
         self.assertTrue(pdf.startswith(b"%PDF"))
         self.assertGreater(len(pdf), 1_000)
+
+    def test_simulated_email_is_unique_per_folio(self) -> None:
+        self.assertEqual(_simulated_email("196992"), "folio-196992@example.com")

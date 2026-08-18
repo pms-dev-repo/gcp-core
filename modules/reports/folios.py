@@ -43,6 +43,11 @@ def _folio_label(folio: dict[str, Any]) -> str:
     return f"{guest} | Room {room} | Folio {bill} | {bill_date}"
 
 
+def _simulated_email(bill_no: str) -> str:
+    """Return a deterministic, clearly fictitious recipient per folio."""
+    return f"folio-{bill_no}@example.com"
+
+
 def build_guest_folio_pdf(
     property_name: str,
     folio: dict[str, Any],
@@ -250,7 +255,8 @@ def render_guest_folios(property_code: str, property_name: str) -> None:
     with email_column:
         recipient = st.text_input(
             "Recipient email for simulation",
-            placeholder="guest@example.com",
+            value=_simulated_email(bill_no),
+            help="Fictitious email generated for this folio. It can be edited for the simulation.",
             key=f"guest_folios_email_{bill_no}",
         ).strip()
         if st.button(
