@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from services.database import get_reports_supabase
+from services.database import get_reports_supabase, get_supabase
 
 
 ARRIVALS_VIEW = "vw_daily_arrivals_transportation"
@@ -115,7 +115,8 @@ def load_transportation_guests(client_code: str) -> list[dict[str, Any]]:
     guests.extend(_map_departure(dict(row)) for row in (departures.data or []))
 
     assignments = (
-        client.table(ASSIGNMENTS_TABLE)
+        get_supabase()
+        .table(ASSIGNMENTS_TABLE)
         .select("*")
         .eq("client_code", client_code)
         .execute()
@@ -149,7 +150,7 @@ def save_transportation_assignment(
         **payload,
     }
     response = (
-        get_reports_supabase()
+        get_supabase()
         .table(ASSIGNMENTS_TABLE)
         .upsert(record, on_conflict="record_key")
         .execute()
