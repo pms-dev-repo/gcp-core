@@ -647,13 +647,9 @@ def render() -> None:
     config = load_client_config(client_code)
     client = config.get("client", {})
     hotel_name = str(client.get("name") or "Property")
-    transportation_config = config.get("guest_transportation", {}) or {}
-    data_client_code = str(
-        transportation_config.get("data_client_code") or client_code
-    )
 
     try:
-        transport_guests = load_transportation_guests(data_client_code)
+        transport_guests = load_transportation_guests(client_code)
     except DatabaseConfigurationError as exc:
         st.error(f"Supabase is not configured: {exc}")
         return
@@ -672,14 +668,14 @@ def render() -> None:
     with arrivals_tab:
         _render_direction_workflow(
             transport_guests,
-            data_client_code,
+            client_code,
             "Arrival",
         )
     with departures_tab:
         _render_direction_workflow(
             transport_guests,
-            data_client_code,
+            client_code,
             "Departure",
         )
     with board_tab:
-        _render_operational_board(transport_guests, data_client_code)
+        _render_operational_board(transport_guests, client_code)

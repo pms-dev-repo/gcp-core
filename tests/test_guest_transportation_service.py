@@ -15,6 +15,7 @@ class _Query:
         return self
 
     def eq(self, *_args, **_kwargs):
+        self.eq_calls = getattr(self, "eq_calls", 0) + 1
         return self
 
     def execute(self):
@@ -83,6 +84,27 @@ class GuestTransportationServiceTests(unittest.TestCase):
             "Grantley Adams International (BGI)",
         )
         self.assertEqual(guests[0]["transport_assignment"]["status"], "Assigned")
+
+    def test_loads_source_views_without_a_client_code_filter(self) -> None:
+        arrival = {
+            "guest_name": "Example,Guest",
+            "arrival_date": "2026-08-18",
+            "departure_date": "2026-08-20",
+        }
+        client = _Client(
+            {
+                "vw_daily_arrivals_transportation": [arrival],
+                "vw_daily_departures_transportation": [],
+                "guest_transportation_assignments": [],
+            }
+        )
+        with patch(
+            "services.guest_transportation_service.get_supabase", return_value=client
+        ):
+            guests = load_transportation_guests("sandy_lane")
+
+        self.assertEqual(len(guests), 1)
+        self.assertEqual(guests[0]["stay"]["arrival_date"], "2026-08-18")
 
 
 if __name__ == "__main__":

@@ -92,17 +92,22 @@ def _map_departure(row: dict[str, Any]) -> dict[str, Any]:
 
 
 def load_transportation_guests(client_code: str) -> list[dict[str, Any]]:
+    """Load the operational views and assignments for the active property.
+
+    The transportation views are already scoped to the available property data
+    and do not expose a ``client_code`` column, so they must not be filtered by
+    client at the REST layer. Saved dispatch assignments remain isolated by the
+    active GCP client code.
+    """
     client = get_supabase()
     arrivals = (
         client.table(ARRIVALS_VIEW)
         .select("*")
-        .eq("client_code", client_code)
         .execute()
     )
     departures = (
         client.table(DEPARTURES_VIEW)
         .select("*")
-        .eq("client_code", client_code)
         .execute()
     )
 
