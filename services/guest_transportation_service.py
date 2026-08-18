@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 from typing import Any
 
-from services.database import get_supabase
+from services.database import get_reports_supabase
 
 
 ARRIVALS_VIEW = "vw_daily_arrivals_transportation"
@@ -99,7 +99,7 @@ def load_transportation_guests(client_code: str) -> list[dict[str, Any]]:
     client at the REST layer. Saved dispatch assignments remain isolated by the
     active GCP client code.
     """
-    client = get_supabase()
+    client = get_reports_supabase()
     arrivals = (
         client.table(ARRIVALS_VIEW)
         .select("*")
@@ -149,7 +149,7 @@ def save_transportation_assignment(
         **payload,
     }
     response = (
-        get_supabase()
+        get_reports_supabase()
         .table(ASSIGNMENTS_TABLE)
         .upsert(record, on_conflict="record_key")
         .execute()

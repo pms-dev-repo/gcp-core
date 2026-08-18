@@ -55,7 +55,7 @@ class GuestTransportationServiceTests(unittest.TestCase):
             }
         )
         with patch(
-            "services.guest_transportation_service.get_supabase",
+            "services.guest_transportation_service.get_reports_supabase",
             return_value=initial_client,
         ):
             initial = load_transportation_guests("GCPHOTEL")
@@ -70,7 +70,7 @@ class GuestTransportationServiceTests(unittest.TestCase):
             }
         ]
         with patch(
-            "services.guest_transportation_service.get_supabase",
+            "services.guest_transportation_service.get_reports_supabase",
             return_value=initial_client,
         ):
             guests = load_transportation_guests("GCPHOTEL")
@@ -99,7 +99,7 @@ class GuestTransportationServiceTests(unittest.TestCase):
             }
         )
         with patch(
-            "services.guest_transportation_service.get_supabase", return_value=client
+            "services.guest_transportation_service.get_reports_supabase", return_value=client
         ):
             guests = load_transportation_guests("sandy_lane")
 
