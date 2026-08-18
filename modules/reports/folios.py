@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 from io import BytesIO
+from pathlib import Path
 from typing import Any
 from xml.sax.saxutils import escape
 
@@ -11,13 +12,16 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import mm
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from modules.reports.service import (
     load_guest_folio_summaries,
     load_guest_folio_transactions,
 )
 from services.database import DatabaseConfigurationError
+
+
+GCP_LOGO_PATH = Path(__file__).resolve().parents[2] / "assets" / "gcp_logo.png"
 
 
 def _as_amount(value: Any) -> float:
@@ -120,8 +124,26 @@ def build_guest_folio_pdf(
             ]
         )
     )
+    logo = Image(str(GCP_LOGO_PATH), width=45 * mm, height=12 * mm)
+    header = Table(
+        [[logo, Paragraph("Guest Folio", styles["Title"])]],
+        colWidths=[52 * mm, 116 * mm],
+    )
+    header.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("ALIGN", (1, 0), (1, 0), "RIGHT"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                ("TOPPADDING", (0, 0), (-1, -1), 0),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ]
+        )
+    )
     story: list[Any] = [
-        Paragraph("Guest Folio", styles["Title"]),
+        header,
+        Spacer(1, 3 * mm),
         Paragraph(escape(property_name), styles["Heading3"]),
         Paragraph(f"Generated: {date.today():%d %b %Y}", styles["BodyText"]),
         Spacer(1, 5 * mm),
@@ -137,18 +159,28 @@ def build_guest_folio_pdf(
 
 def render_guest_folios(property_code: str, property_name: str) -> None:
     st.subheader("Guest Folios")
-    st.caption("Search by guest name, room, or folio number. Email delivery is a simulation only and does not send an email.")
+    st.caption("Search by guest name, room, folio number, or checkout date. Email delivery is a simulation only and does not send an email.")
+    checkout_date = st.date_input(
+        "Checkout date",
+        value=None,
+        help="Uses the folio generation date supplied by OPERA R&A.",
+        key="guest_folios_checkout_date",
+    )
     search_term = st.text_input(
         "Guest, room, or folio number",
         key="guest_folios_search",
         placeholder="For example: Smith, 317, or 196992",
     ).strip()
-    if not search_term:
-        st.info("Enter a guest name, room, or folio number to find a folio.")
+    if not search_term and not checkout_date:
+        st.info("Enter a guest name, room, folio number, or select a checkout date to find a folio.")
         return
 
     try:
-        folios = load_guest_folio_summaries(property_code, search_term)
+        folios = load_guest_folio_summaries(
+            property_code,
+            search_term,
+            checkout_date.isoformat() if checkout_date else None,
+        )
     except DatabaseConfigurationError as exc:
         st.error(str(exc))
         return

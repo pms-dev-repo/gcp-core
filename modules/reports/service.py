@@ -133,27 +133,29 @@ def load_room_performance(property_code: str) -> list[dict[str, Any]]:
 
 def load_guest_folio_summaries(
     property_code: str,
-    search_term: str,
+    search_term: str = "",
+    checkout_date: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Find guest folios by guest name, room, or bill number."""
+    """Find guest folios by guest name, room, bill number, or checkout date."""
     normalized_search = search_term.strip().replace(",", " ")
-    if not normalized_search:
+    if not normalized_search and not checkout_date:
         return []
 
-    response = (
+    query = (
         get_reports_supabase()
         .table(GUEST_FOLIO_SUMMARY_VIEW)
         .select("*")
         .eq("property", property_code)
-        .or_(
+    )
+    if checkout_date:
+        query = query.eq("bill_generation_date", checkout_date)
+    if normalized_search:
+        query = query.or_(
             "display_name.ilike.%{term}%,room.ilike.%{term}%,bill_no.ilike.%{term}%".format(
                 term=normalized_search
             )
         )
-        .order("bill_generation_date", desc=True)
-        .limit(100)
-        .execute()
-    )
+    response = query.order("bill_generation_date", desc=True).limit(100).execute()
     return [dict(row) for row in (response.data or [])]
 
 

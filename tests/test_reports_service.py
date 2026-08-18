@@ -140,3 +140,19 @@ class ReportsServiceTests(unittest.TestCase):
         get_reports_supabase.return_value.table.assert_called_once_with(
             "rpt_guest_folio_details"
         )
+
+    @patch.object(service, "get_reports_supabase")
+    def test_load_guest_folio_summaries_filters_checkout_date(
+        self, get_reports_supabase: MagicMock
+    ) -> None:
+        query = MagicMock()
+        (
+            get_reports_supabase.return_value.table.return_value.select.return_value.eq.return_value.eq.return_value.order.return_value.limit.return_value
+        ) = query
+        query.execute.return_value.data = [{"bill_no": "196992"}]
+
+        rows = service.load_guest_folio_summaries(
+            "SANDYL", checkout_date="2026-08-01"
+        )
+
+        self.assertEqual(rows, [{"bill_no": "196992"}])
